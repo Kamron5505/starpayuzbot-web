@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <title data-i18n="leaderboard">Рейтинг</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0810;
+      --bg-elevated: #120e18;
+      --card: #18121f;
+      --card-hover: #221a2c;
+      --border: rgba(212, 175, 90, 0.1);
+      --text: #f5f0e8;
+      --text-muted: #9a8fa8;
+      --gold: #e4b84a;
+      --gold-dim: #b8923a;
+      --gold-glow: rgba(228, 184, 74, 0.22);
+      --accent: #8b5cf6;
+      --accent-warm: #c17f3a;
+      --accent-hover: #a78bfa;
+      --success: #4ade80;
+      --danger: #fb7185;
+      --radius: 16px;
+      --radius-sm: 12px;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+      --t-fast: 0.15s var(--ease-out);
+      --t-base: 0.28s var(--ease-out);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      min-height: 100dvh;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      padding-bottom: calc(80px + var(--safe-bottom));
+    }
+
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 12px 16px 24px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .back-btn {
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card);
+      color: var(--text);
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background var(--t-base), border-color var(--t-base), transform var(--t-fast);
+    }
+
+    .back-btn:active { transform: scale(0.92); }
+
+    .title {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .filter-btn {
+      padding: 8px 16px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--card);
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background var(--t-base), border-color var(--t-base), color var(--t-base);
+    }
+
+    .filter-btn.active {
+      background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+      color: #0c0e14;
+      border-color: var(--gold);
+    }
+
+    .leaderboard-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      transition: background var(--t-base), transform var(--t-base);
+    }
+
+    .leaderboard-item:active { transform: scale(0.98); background: var(--card-hover); }
+
+    .rank-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 800;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .rank-badge.rank-1 {
+      background: linear-gradient(135deg, #ffd700, #ffed4e);
+      color: #0c0e14;
+    }
+
+    .rank-badge.rank-2 {
+      background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+      color: #0c0e14;
+    }
+
+    .rank-badge.rank-3 {
+      background: linear-gradient(135deg, #cd7f32, #e8a76a);
+      color: #0c0e14;
+    }
+
+    .rank-badge.rank-other {
+      background: var(--bg-elevated);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    .medal {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      font-size: 20px;
+    }
+
+    .leaderboard-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .leaderboard-name {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .leaderboard-stats {
+      display: flex;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .leaderboard-amount {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--gold);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--text-muted);
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      border: 3px solid rgba(228, 184, 74, 0.15);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.75s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 16px;
+      color: var(--text-muted);
+    }
+
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .empty-text {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    /* Footer Navigation */
+    .footer-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: 60px;
+      padding-bottom: var(--safe-bottom);
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      flex: 1;
+      height: 60px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color var(--t-base);
+    }
+
+    .nav-item.active {
+      color: var(--gold);
+    }
+
+    .nav-icon {
+      font-size: 20px;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .leaderboard-item:hover {
+        background: var(--card-hover);
+        border-color: rgba(228, 184, 74, 0.35);
+      }
+
+      .filter-btn:hover {
+        border-color: rgba(228, 184, 74, 0.35);
+        background: var(--card-hover);
+      }
+
+      .back-btn:hover {
+        background: var(--card-hover);
+        border-color: rgba(228, 184, 74, 0.4);
+        color: var(--gold);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <button class="back-btn" onclick="goHome()">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h1 class="title" data-i18n="leaderboardTitle">Энг яхши покупатели</h1>
+    </div>
+
+    <div class="filters">
+      <button class="filter-btn active" data-filter="today" onclick="setFilter('today')" data-i18n="today">Бугун</button>
+      <button class="filter-btn" data-filter="week" onclick="setFilter('week')" data-i18n="thisWeek">Бу ҳафта</button>
+      <button class="filter-btn" data-filter="month" onclick="setFilter('month')" data-i18n="thisMonth">Бу ой</button>
+    </div>
+
+    <div id="leaderboardContent">
+      <div class="loading">
+        <div class="spinner"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Navigation -->
+  <div class="footer-nav">
+    <a class="nav-item" href="/" onclick="navigateTo('home', event)">
+      <i class="nav-icon fas fa-home"></i>
+      <span data-i18n="home">Асосий</span>
+    </a>
+    <a class="nav-item" href="/orders" onclick="navigateTo('orders', event)">
+      <i class="nav-icon fas fa-shopping-bag"></i>
+      <span data-i18n="orders">Буюртмалар</span>
+    </a>
+    <a class="nav-item active" href="/leaderboard" onclick="navigateTo('leaderboard', event)">
+      <i class="nav-icon fas fa-trophy"></i>
+      <span data-i18n="leaderboard">Рейтинг</span>
+    </a>
+    <a class="nav-item" href="/settings" onclick="navigateTo('settings', event)">
+      <i class="nav-icon fas fa-cog"></i>
+      <span data-i18n="settings">Созламалар</span>
+    </a>
+  </div>
+
+  <script src="../js/i18n.js"></script>
+  <script>
+    let currentFilter = 'today';
+
+    async function loadLeaderboard() {
+      try {
+        const response = await fetch(`/api/bot/leaderboard?period=${currentFilter}`);
+        const data = await response.json();
+        
+        if (data.success && data.data && data.data.length > 0) {
+          renderLeaderboard(data.data);
+        } else {
+          showEmptyState();
+        }
+      } catch (error) {
+        console.error('Error loading leaderboard:', error);
+        showEmptyState();
+      }
+    }
+
+    function renderLeaderboard(items) {
+      const content = document.getElementById('leaderboardContent');
+      
+      let html = '<div class="leaderboard-list">';
+      
+      items.forEach((item, index) => {
+        const rank = index + 1;
+        let rankClass = 'rank-other';
+        let medal = '';
+        
+        if (rank === 1) {
+          rankClass = 'rank-1';
+          medal = '🥇';
+        } else if (rank === 2) {
+          rankClass = 'rank-2';
+          medal = '🥈';
+        } else if (rank === 3) {
+          rankClass = 'rank-3';
+          medal = '🥉';
+        }
+        
+        html += `
+          <div class="leaderboard-item">
+            <div class="rank-badge ${rankClass}">
+              ${rank}
+              ${medal ? `<span class="medal">${medal}</span>` : ''}
+            </div>
+            <div class="leaderboard-info">
+              <div class="leaderboard-name">${escapeHtml(item.name || 'User')}</div>
+              <div class="leaderboard-stats">
+                <span>${item.orders || 0} ${i18n.t('orders')}</span>
+              </div>
+            </div>
+            <div class="leaderboard-amount">${formatAmount(item.total || 0)}</div>
+          </div>
+        `;
+      });
+      
+      html += '</div>';
+      content.innerHTML = html;
+    }
+
+    function showEmptyState() {
+      const content = document.getElementById('leaderboardContent');
+      content.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">📊</div>
+          <div class="empty-text" data-i18n="noData">Маълумот йўқ</div>
+        </div>
+      `;
+    }
+
+    function setFilter(filter) {
+      currentFilter = filter;
+      
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.querySelector(`[data-filter="${filter}"]`).classList.add('active');
+      
+      loadLeaderboard();
+    }
+
+    function formatAmount(amount) {
+      return new Intl.NumberFormat('uz-UZ').format(amount) + ' сўм';
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function goHome() {
+      window.location.href = '/';
+    }
+
+    function navigateTo(page, event) {
+      event.preventDefault();
+      // Navigation logic here
+    }
+
+    // Load leaderboard on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      i18n.init();
+      loadLeaderboard();
+    });
+  </script>
+</body>
+</html>

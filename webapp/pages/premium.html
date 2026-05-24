@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium - StarPayUz</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-dark">
+    
+    <div class="app-container">
+        
+        <header class="app-header">
+            <div class="header-content">
+                <button class="back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1 class="page-title">Telegram Premium</h1>
+                <div></div>
+            </div>
+        </header>
+
+        <div class="info-card glass-card" style="margin: 1rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+            <div class="info-icon premium-gradient">
+                <i class="fas fa-gem"></i>
+            </div>
+            <h2 class="info-title">Telegram Premium</h2>
+            <p class="info-desc">Premium obuna bilan Telegram'dan maksimal darajada foydalaning!</p>
+        </div>
+
+        <div class="packages-section" style="padding: 1rem; max-width: 600px; margin: 0 auto;">
+            <h3 class="section-title">Obuna muddatini tanlang</h3>
+            <div class="premium-packages">
+                
+                <div class="premium-card" onclick="selectPremium(3, 160000)">
+                    <div class="premium-duration">3 oy</div>
+                    <div class="premium-price">160,000 so'm</div>
+                    <div class="premium-per-month">~53,333 so'm/oy</div>
+                    <button class="premium-btn">Tanlash</button>
+                </div>
+
+                <div class="premium-card featured" onclick="selectPremium(6, 220000)">
+                    <div class="premium-badge">Eng yaxshi</div>
+                    <div class="premium-duration">6 oy</div>
+                    <div class="premium-price">220,000 so'm</div>
+                    <div class="premium-per-month">~36,667 so'm/oy</div>
+                    <div class="premium-save">60,000 so'm tejang!</div>
+                    <button class="premium-btn">Tanlash</button>
+                </div>
+
+                <div class="premium-card" onclick="selectPremium(12, 380000)">
+                    <div class="premium-duration">12 oy</div>
+                    <div class="premium-price">380,000 so'm</div>
+                    <div class="premium-per-month">~31,667 so'm/oy</div>
+                    <div class="premium-save">100,000 so'm tejang!</div>
+                    <button class="premium-btn">Tanlash</button>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="features-section" style="padding: 1rem; max-width: 600px; margin: 0 auto;">
+            <h3 class="section-title">Premium imkoniyatlari</h3>
+            <div class="features-list">
+                <div class="feature-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Tezroq yuklab olish</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Eksklyuziv stikerlar</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Premium emoji</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Katta fayllar (4GB)</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Reklama yo'q</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="../js/telegram.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/ui.js"></script>
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+
+        function selectPremium(months, price) {
+            telegramApp.hapticFeedback('medium');
+            telegramApp.showConfirm(
+                `${months} oylik Premium obuna sotib olmoqchimisiz? Narx: ${formatCurrency(price)}`,
+                (confirmed) => {
+                    if (confirmed) {
+                        purchasePremium(months, price);
+                    }
+                }
+            );
+        }
+
+        async function purchasePremium(months, price) {
+            try {
+                const userData = telegramApp.getUserData();
+                const result = await api.purchasePremium({
+                    user_id: userData.id,
+                    months: months,
+                    amount: price
+                });
+                
+                if (result.success) {
+                    showToast('Buyurtma qabul qilindi!', 'success');
+                    setTimeout(() => window.location.href = '../index.html', 2000);
+                }
+            } catch (error) {
+                showToast('Xatolik yuz berdi', 'error');
+            }
+        }
+    </script>
+
+    <style>
+        .premium-packages {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .premium-card {
+            position: relative;
+            background: var(--bg-card);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .premium-card.featured {
+            border-color: rgba(245, 87, 108, 0.5);
+            background: linear-gradient(135deg, rgba(240, 147, 251, 0.1) 0%, rgba(245, 87, 108, 0.1) 100%);
+        }
+
+        .premium-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .premium-badge {
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background: var(--gradient-premium);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .premium-duration {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .premium-price {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .premium-per-month {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .premium-save {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+            padding: 0.5rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .premium-btn {
+            width: 100%;
+            background: var(--gradient-premium);
+            border: none;
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .features-list {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+        }
+
+        .feature-item i {
+            color: var(--accent-green);
+            font-size: 1.25rem;
+        }
+    </style>
+
+</body>
+</html>

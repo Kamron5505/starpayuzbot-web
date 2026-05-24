@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balansni to'ldirish - StarPayUz</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-dark">
+    
+    <div class="app-container">
+        
+        <header class="app-header">
+            <div class="header-content">
+                <button class="back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1 class="page-title">Balansni to'ldirish</h1>
+                <div></div>
+            </div>
+        </header>
+
+        <!-- Amount Input -->
+        <div class="amount-section" style="padding: 2rem 1rem; max-width: 600px; margin: 0 auto;">
+            <div class="amount-card glass-card">
+                <label class="amount-label">Summa (so'm)</label>
+                <div class="amount-input-group">
+                    <input type="number" id="amount-input" class="amount-input" placeholder="0" min="1000" step="1000">
+                    <span class="currency-label">so'm</span>
+                </div>
+                <div class="amount-hints">
+                    <button class="amount-hint-btn" onclick="setAmount(10000)">10,000</button>
+                    <button class="amount-hint-btn" onclick="setAmount(50000)">50,000</button>
+                    <button class="amount-hint-btn" onclick="setAmount(100000)">100,000</button>
+                    <button class="amount-hint-btn" onclick="setAmount(500000)">500,000</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Methods -->
+        <div class="payment-section" style="padding: 0 1rem 2rem; max-width: 600px; margin: 0 auto;">
+            <h3 class="section-title">To'lov usuli</h3>
+            <div class="payment-methods">
+                
+                <div class="payment-method-card" onclick="selectPaymentMethod('card')">
+                    <div class="payment-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <div class="payment-info">
+                        <h4 class="payment-title">Karta orqali</h4>
+                        <p class="payment-desc">Uzcard, Humo</p>
+                    </div>
+                    <div class="payment-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+
+                <div class="payment-method-card" onclick="selectPaymentMethod('click')">
+                    <div class="payment-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="payment-info">
+                        <h4 class="payment-title">Click</h4>
+                        <p class="payment-desc">Click ilovasi orqali</p>
+                    </div>
+                    <div class="payment-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+
+                <div class="payment-method-card" onclick="selectPaymentMethod('payme')">
+                    <div class="payment-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="payment-info">
+                        <h4 class="payment-title">Payme</h4>
+                        <p class="payment-desc">Payme ilovasi orqali</p>
+                    </div>
+                    <div class="payment-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Card Details (Hidden by default) -->
+        <div id="card-details" class="card-details glass-card" style="display: none; margin: 0 1rem 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+            <h3 class="card-details-title">Karta ma'lumotlari</h3>
+            <div class="card-info">
+                <div class="card-info-row">
+                    <span class="card-label">Karta raqami:</span>
+                    <span class="card-value" id="card-number">9860 1801 0171 2578</span>
+                    <button class="copy-btn" onclick="copyCardNumber()">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+                <div class="card-info-row">
+                    <span class="card-label">Karta egasi:</span>
+                    <span class="card-value">ISXAKOVA AZIZA</span>
+                </div>
+                <div class="card-info-row">
+                    <span class="card-label">Telefon:</span>
+                    <span class="card-value">+998 93 582 10 00</span>
+                </div>
+            </div>
+            <div class="card-instructions">
+                <p>1. Yuqoridagi kartaga pul o'tkazing</p>
+                <p>2. Chek rasmini yuboring: <a href="https://t.me/CardKamron" target="_blank">@CardKamron</a></p>
+                <p>3. Admin tasdiqlashini kuting</p>
+            </div>
+            <button class="confirm-payment-btn" onclick="confirmPayment()">
+                <i class="fas fa-check"></i>
+                To'lovni tasdiqladim
+            </button>
+        </div>
+
+    </div>
+
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-message">Success!</span>
+    </div>
+
+    <script src="../js/telegram.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/ui.js"></script>
+    <script>
+        let selectedMethod = null;
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function setAmount(amount) {
+            telegramApp.hapticFeedback('light');
+            document.getElementById('amount-input').value = amount;
+        }
+
+        function selectPaymentMethod(method) {
+            telegramApp.hapticFeedback('medium');
+            selectedMethod = method;
+
+            const amount = parseInt(document.getElementById('amount-input').value);
+            
+            if (!amount || amount < 1000) {
+                showToast('Minimal summa: 1,000 so\'m', 'error');
+                return;
+            }
+
+            if (method === 'card') {
+                document.getElementById('card-details').style.display = 'block';
+                document.getElementById('card-details').scrollIntoView({ behavior: 'smooth' });
+            } else {
+                showToast('Bu to\'lov usuli hozircha mavjud emas', 'error');
+            }
+        }
+
+        function copyCardNumber() {
+            telegramApp.hapticFeedback('medium');
+            const cardNumber = document.getElementById('card-number').textContent;
+            navigator.clipboard.writeText(cardNumber.replace(/\s/g, ''));
+            showToast('Karta raqami nusxalandi', 'success');
+        }
+
+        function confirmPayment() {
+            telegramApp.hapticFeedback('medium');
+            
+            const amount = parseInt(document.getElementById('amount-input').value);
+            
+            if (!amount || amount < 1000) {
+                showToast('Minimal summa: 1,000 so\'m', 'error');
+                return;
+            }
+
+            telegramApp.showConfirm(
+                `${formatCurrency(amount)} to'lovni tasdiqlamoqchimisiz?`,
+                (confirmed) => {
+                    if (confirmed) {
+                        processTopup(amount);
+                    }
+                }
+            );
+        }
+
+        async function processTopup(amount) {
+            try {
+                const userData = telegramApp.getUserData();
+                
+                // Send to admin for confirmation
+                showToast('So\'rov yuborildi. Admin tasdiqlashini kuting.', 'success');
+                
+                setTimeout(() => {
+                    window.location.href = '../index.html';
+                }, 2000);
+                
+            } catch (error) {
+                showToast('Xatolik yuz berdi', 'error');
+            }
+        }
+    </script>
+
+    <style>
+        .amount-card {
+            padding: 2rem;
+        }
+
+        .amount-label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .amount-input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: var(--bg-card);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            padding: 0 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .amount-input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 2rem;
+            font-weight: 700;
+            padding: 1rem 0;
+            outline: none;
+        }
+
+        .currency-label {
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+        }
+
+        .amount-hints {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+        }
+
+        .amount-hint-btn {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .amount-hint-btn:hover {
+            border-color: rgba(102, 126, 234, 0.5);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .payment-methods {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .payment-method-card {
+            background: var(--bg-card);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-method-card:hover {
+            border-color: rgba(102, 126, 234, 0.5);
+            transform: translateX(4px);
+        }
+
+        .payment-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-main);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .payment-info {
+            flex: 1;
+        }
+
+        .payment-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .payment-desc {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .payment-arrow {
+            color: var(--text-secondary);
+        }
+
+        .card-details {
+            padding: 1.5rem;
+        }
+
+        .card-details-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .card-info {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-info-row:last-child {
+            border-bottom: none;
+        }
+
+        .card-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .card-value {
+            font-weight: 600;
+            font-family: monospace;
+        }
+
+        .copy-btn {
+            background: var(--bg-card);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--gradient-main);
+            color: white;
+        }
+
+        .card-instructions {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--accent-orange);
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 1rem;
+        }
+
+        .card-instructions p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-instructions a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        .confirm-payment-btn {
+            width: 100%;
+            background: var(--gradient-main);
+            border: none;
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            color: white;
+            font-weight: 600;
+            font-size: 1.125rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .confirm-payment-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        @media (max-width: 640px) {
+            .amount-hints {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+
+</body>
+</html>

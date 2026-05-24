@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gifts - StarPayUz</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-dark">
+    
+    <div class="app-container">
+        
+        <header class="app-header">
+            <div class="header-content">
+                <button class="back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1 class="page-title">Telegram Gifts</h1>
+                <div></div>
+            </div>
+        </header>
+
+        <div class="info-card glass-card" style="margin: 1rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+            <div class="info-icon gifts-gradient">
+                <i class="fas fa-gift"></i>
+            </div>
+            <h2 class="info-title">Telegram Gifts</h2>
+            <p class="info-desc">Do'stlaringizga maxsus Telegram giftlarini yuboring!</p>
+            <div class="info-price">
+                <span class="price-label">Narx:</span>
+                <span class="price-value">50,000 so'm</span>
+            </div>
+        </div>
+
+        <!-- Username Input -->
+        <div class="input-section" style="padding: 1rem; max-width: 600px; margin: 0 auto;">
+            <h3 class="section-title">Qabul qiluvchi</h3>
+            <div class="input-group">
+                <i class="fas fa-at"></i>
+                <input type="text" id="recipient-username" placeholder="username" class="username-input">
+            </div>
+            <p class="input-hint">@ belgisiz kiriting</p>
+        </div>
+
+        <!-- Gifts Grid -->
+        <div class="gifts-section" style="padding: 1rem; max-width: 600px; margin: 0 auto;">
+            <h3 class="section-title">Giftni tanlang</h3>
+            <div class="gifts-grid">
+                
+                <div class="gift-card" onclick="selectGift('bear', '🐻 Ayiq')">
+                    <div class="gift-emoji">🐻</div>
+                    <div class="gift-name">Ayiq</div>
+                </div>
+
+                <div class="gift-card" onclick="selectGift('heart', '❤️ Yurak')">
+                    <div class="gift-emoji">❤️</div>
+                    <div class="gift-name">Yurak</div>
+                </div>
+
+                <div class="gift-card" onclick="selectGift('gift', '🎁 Gift')">
+                    <div class="gift-emoji">🎁</div>
+                    <div class="gift-name">Gift</div>
+                </div>
+
+                <div class="gift-card" onclick="selectGift('rose', '🌹 Gul')">
+                    <div class="gift-emoji">🌹</div>
+                    <div class="gift-name">Gul</div>
+                </div>
+
+                <div class="gift-card" onclick="selectGift('cake', '🎂 Tort')">
+                    <div class="gift-emoji">🎂</div>
+                    <div class="gift-name">Tort</div>
+                </div>
+
+                <div class="gift-card" onclick="selectGift('flower', '🌸 Gul')">
+                    <div class="gift-emoji">🌸</div>
+                    <div class="gift-name">Gul</div>
+                </div>
+
+                <div class="gift-card" onclick="selectGift('rocket', '🚀 Raketa')">
+                    <div class="gift-emoji">🚀</div>
+                    <div class="gift-name">Raketa</div>
+                </div>
+
+                <div class="gift-card" onclick="selectGift('ring', '💍 Halqa')">
+                    <div class="gift-emoji">💍</div>
+                    <div class="gift-name">Halqa</div>
+                </div>
+
+                <div class="gift-card" onclick="selectGift('diamond', '💎 Olmaz')">
+                    <div class="gift-emoji">💎</div>
+                    <div class="gift-name">Olmaz</div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-message">Success!</span>
+    </div>
+
+    <script src="../js/telegram.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/ui.js"></script>
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+
+        function selectGift(giftKey, giftName) {
+            telegramApp.hapticFeedback('medium');
+            
+            const username = document.getElementById('recipient-username').value.trim();
+            
+            if (!username) {
+                showToast('Username kiriting', 'error');
+                return;
+            }
+            
+            telegramApp.showConfirm(
+                `${giftName} giftini @${username} ga yubormoqchimisiz? Narx: 50,000 so'm`,
+                (confirmed) => {
+                    if (confirmed) {
+                        purchaseGift(giftKey, giftName, username);
+                    }
+                }
+            );
+        }
+
+        async function purchaseGift(giftKey, giftName, username) {
+            try {
+                const userData = telegramApp.getUserData();
+                
+                const result = await api.purchaseGift({
+                    user_id: userData.id,
+                    gift_key: giftKey,
+                    gift_name: giftName,
+                    recipient: username,
+                    amount: 50000
+                });
+                
+                if (result.success) {
+                    telegramApp.notificationOccurred('success');
+                    showToast('Gift sotib olindi!', 'success');
+                    setTimeout(() => {
+                        window.location.href = '../index.html';
+                    }, 2000);
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                telegramApp.notificationOccurred('error');
+                showToast('Xatolik yuz berdi', 'error');
+            }
+        }
+    </script>
+
+    <style>
+        .input-section {
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: var(--bg-card);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            padding: 0 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group:focus-within {
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .input-group i {
+            color: var(--text-secondary);
+            margin-right: 0.75rem;
+        }
+
+        .username-input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1rem;
+            padding: 1rem 0;
+            outline: none;
+        }
+
+        .username-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .input-hint {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .gifts-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .gift-card {
+            background: var(--bg-card);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .gift-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(79, 172, 254, 0.5);
+            box-shadow: 0 8px 32px rgba(79, 172, 254, 0.3);
+        }
+
+        .gift-card.selected {
+            border-color: rgba(79, 172, 254, 1);
+            background: rgba(79, 172, 254, 0.1);
+        }
+
+        .gift-emoji {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .gift-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 640px) {
+            .gifts-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.75rem;
+            }
+
+            .gift-card {
+                padding: 1rem 0.5rem;
+            }
+
+            .gift-emoji {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+
+</body>
+</html>

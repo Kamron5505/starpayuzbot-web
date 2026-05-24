@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buyurtmalar - StarPayUz</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-dark">
+    
+    <div class="app-container">
+        
+        <header class="app-header">
+            <div class="header-content">
+                <button class="back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1 class="page-title">Buyurtmalar</h1>
+                <button class="refresh-btn" onclick="refreshOrders()">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Filter Tabs -->
+        <div class="filter-tabs" style="padding: 1rem; max-width: 600px; margin: 0 auto;">
+            <button class="filter-tab active" onclick="filterOrders('all')">
+                Barchasi
+            </button>
+            <button class="filter-tab" onclick="filterOrders('pending')">
+                Kutilmoqda
+            </button>
+            <button class="filter-tab" onclick="filterOrders('completed')">
+                Bajarilgan
+            </button>
+        </div>
+
+        <!-- Orders List -->
+        <div id="orders-container" class="orders-container" style="padding: 0 1rem 2rem; max-width: 600px; margin: 0 auto;">
+            <!-- Loading skeleton -->
+            <div id="loading-skeleton">
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-message">Success!</span>
+    </div>
+
+    <script src="../js/telegram.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/ui.js"></script>
+    <script>
+        let allOrders = [];
+        let currentFilter = 'all';
+
+        async function loadOrders() {
+            try {
+                const userData = telegramApp.getUserData();
+                
+                if (!userData.id) {
+                    showEmptyState();
+                    return;
+                }
+
+                const result = await api.getUserOrders(userData.id, 50);
+                allOrders = result.data || [];
+                
+                displayOrders();
+                
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                showEmptyState();
+            }
+        }
+
+        function displayOrders() {
+            const container = document.getElementById('orders-container');
+            document.getElementById('loading-skeleton').style.display = 'none';
+            
+            let filteredOrders = allOrders;
+            
+            if (currentFilter !== 'all') {
+                filteredOrders = allOrders.filter(order => order.status === currentFilter);
+            }
+            
+            if (filteredOrders.length === 0) {
+                showEmptyState();
+                return;
+            }
+            
+            container.innerHTML = filteredOrders.map(order => createOrderCard(order)).join('');
+        }
+
+        function createOrderCard(order) {
+            const statusConfig = {
+                'pending': {
+                    icon: 'fa-clock',
+                    color: '#f59e0b',
+                    text: 'Kutilmoqda'
+                },
+                'completed': {
+                    icon: 'fa-check-circle',
+                    color: '#10b981',
+                    text: 'Bajarildi'
+                },
+                'cancelled': {
+                    icon: 'fa-times-circle',
+                    color: '#ef4444',
+                    text: 'Bekor qilindi'
+                }
+            };
+            
+            const status = statusConfig[order.status] || statusConfig['pending'];
+            const date = new Date(order.created_at).toLocaleDateString('uz-UZ', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+            
+            return `
+                <div class="order-card glass-card" onclick="showOrderDetails(${order.order_id})">
+                    <div class="order-header">
+                        <div class="order-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="order-info">
+                            <h4 class="order-title">${order.service || 'Xizmat'}</h4>
+                            <p class="order-date">${date}</p>
+                        </div>
+                        <div class="order-status" style="color: ${status.color}">
+                            <i class="fas ${status.icon}"></i>
+                        </div>
+                    </div>
+                    <div class="order-footer">
+                        <div class="order-amount">${formatCurrency(order.amount)}</div>
+                        <div class="order-status-text" style="color: ${status.color}">
+                            ${status.text}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showEmptyState() {
+            const container = document.getElementById('orders-container');
+            document.getElementById('loading-skeleton').style.display = 'none';
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-shopping-bag"></i>
+                    <p>Buyurtmalar yo'q</p>
+                </div>
+            `;
+        }
+
+        function filterOrders(filter) {
+            telegramApp.hapticFeedback('light');
+            currentFilter = filter;
+            
+            // Update active tab
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            displayOrders();
+        }
+
+        function refreshOrders() {
+            telegramApp.hapticFeedback('medium');
+            document.getElementById('loading-skeleton').style.display = 'block';
+            loadOrders();
+        }
+
+        function showOrderDetails(orderId) {
+            telegramApp.hapticFeedback('medium');
+            window.location.href = `order-details.html?id=${orderId}`;
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        // Load orders on page load
+        document.addEventListener('DOMContentLoaded', loadOrders);
+    </script>
+
+    <style>
+        .refresh-btn {
+            background: var(--bg-card);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            transform: rotate(180deg);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .filter-tab {
+            background: var(--bg-card);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        .filter-tab.active {
+            background: var(--gradient-main);
+            border-color: transparent;
+            color: white;
+        }
+
+        .orders-container {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .order-card {
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .order-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .order-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .order-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-stars);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .order-info {
+            flex: 1;
+        }
+
+        .order-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .order-date {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .order-status {
+            font-size: 1.5rem;
+        }
+
+        .order-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .order-amount {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .order-status-text {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .skeleton-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .empty-state p {
+            font-size: 1.125rem;
+        }
+    </style>
+
+</body>
+</html>

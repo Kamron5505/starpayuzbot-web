@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil - StarPayUz</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-dark">
+    
+    <div class="app-container">
+        
+        <header class="app-header">
+            <div class="header-content">
+                <button class="back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1 class="page-title">Profil</h1>
+                <div></div>
+            </div>
+        </header>
+
+        <!-- Profile Header -->
+        <div class="profile-header-section" style="padding: 2rem 1rem; max-width: 600px; margin: 0 auto;">
+            <div class="profile-avatar-large">
+                <i class="fas fa-user"></i>
+            </div>
+            <h2 class="profile-name-large" id="profile-name">Loading...</h2>
+            <p class="profile-username" id="profile-username">@username</p>
+            <p class="profile-id-text" id="profile-id">ID: ...</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid" style="padding: 0 1rem 2rem; max-width: 600px; margin: 0 auto;">
+            <div class="stat-card glass-card">
+                <div class="stat-icon" style="background: var(--gradient-stars);">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value" id="total-orders">0</div>
+                    <div class="stat-label">Buyurtmalar</div>
+                </div>
+            </div>
+
+            <div class="stat-card glass-card">
+                <div class="stat-icon" style="background: var(--gradient-premium);">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value" id="total-spent">0</div>
+                    <div class="stat-label">Sarflangan</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu Items -->
+        <div class="profile-menu" style="padding: 0 1rem 2rem; max-width: 600px; margin: 0 auto;">
+            
+            <div class="menu-item" onclick="openOrders()">
+                <div class="menu-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <div class="menu-text">Buyurtmalar tarixi</div>
+                <div class="menu-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+
+            <div class="menu-item" onclick="openChannel()">
+                <div class="menu-icon">
+                    <i class="fas fa-paper-plane"></i>
+                </div>
+                <div class="menu-text">Telegram kanalimiz</div>
+                <div class="menu-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+
+            <div class="menu-item" onclick="openSupport()">
+                <div class="menu-icon">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <div class="menu-text">Yordam</div>
+                <div class="menu-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+
+            <div class="menu-item" onclick="shareApp()">
+                <div class="menu-icon">
+                    <i class="fas fa-share-alt"></i>
+                </div>
+                <div class="menu-text">Do'stlarga ulashish</div>
+                <div class="menu-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- App Info -->
+        <div class="app-info" style="padding: 0 1rem 4rem; max-width: 600px; margin: 0 auto; text-align: center;">
+            <p class="app-version">StarPayUz v1.0.0</p>
+            <p class="app-copyright">© 2024 StarPayUz. Barcha huquqlar himoyalangan.</p>
+        </div>
+
+    </div>
+
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-message">Success!</span>
+    </div>
+
+    <script src="../js/telegram.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/ui.js"></script>
+    <script>
+        async function loadProfile() {
+            try {
+                const userData = telegramApp.getUserData();
+                
+                // Update profile info
+                const fullName = `${userData.first_name} ${userData.last_name}`.trim();
+                document.getElementById('profile-name').textContent = fullName || 'User';
+                document.getElementById('profile-username').textContent = userData.username ? `@${userData.username}` : '';
+                document.getElementById('profile-id').textContent = `ID: ${userData.id || 'Demo'}`;
+                
+                // Load stats
+                if (userData.id) {
+                    const orders = await api.getUserOrders(userData.id, 100);
+                    const ordersData = orders.data || [];
+                    
+                    document.getElementById('total-orders').textContent = ordersData.length;
+                    
+                    const totalSpent = ordersData
+                        .filter(o => o.status === 'completed')
+                        .reduce((sum, o) => sum + o.amount, 0);
+                    
+                    document.getElementById('total-spent').textContent = formatCurrency(totalSpent);
+                }
+                
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function openOrders() {
+            telegramApp.hapticFeedback('light');
+            window.location.href = 'orders.html';
+        }
+
+        function openChannel() {
+            telegramApp.hapticFeedback('light');
+            telegramApp.openTelegramLink('https://t.me/StarPayUzz');
+        }
+
+        function openSupport() {
+            telegramApp.hapticFeedback('light');
+            telegramApp.openTelegramLink('https://t.me/StarPayUzAdmin');
+        }
+
+        function shareApp() {
+            telegramApp.hapticFeedback('medium');
+            const shareUrl = 'https://t.me/StarPayUzAuto_bot';
+            const shareText = '🚀 StarPayUz - Telegram Stars, Premium va Gifts xizmatlari!';
+            telegramApp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`);
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProfile);
+    </script>
+
+    <style>
+        .profile-header-section {
+            text-align: center;
+        }
+
+        .profile-avatar-large {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--gradient-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            margin: 0 auto 1rem;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .profile-name-large {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-username {
+            color: var(--accent-blue);
+            font-size: 1.125rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .profile-id-text {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-card {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .stat-info {
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .profile-menu {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .menu-item {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-lg);
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item:hover {
+            border-color: rgba(102, 126, 234, 0.5);
+            transform: translateX(4px);
+        }
+
+        .menu-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-blue);
+            font-size: 1.25rem;
+        }
+
+        .menu-text {
+            flex: 1;
+            font-weight: 600;
+        }
+
+        .menu-arrow {
+            color: var(--text-secondary);
+        }
+
+        .app-info {
+            color: var(--text-secondary);
+        }
+
+        .app-version {
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .app-copyright {
+            font-size: 0.75rem;
+        }
+    </style>
+
+</body>
+</html>

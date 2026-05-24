@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stars - StarPayUz</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-dark">
+    
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <button class="back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1 class="page-title">Telegram Stars</h1>
+                <div></div>
+            </div>
+        </header>
+
+        <!-- Stars Info -->
+        <div class="info-card glass-card" style="margin: 1rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+            <div class="info-icon stars-gradient">
+                <i class="fas fa-star"></i>
+            </div>
+            <h2 class="info-title">Telegram Stars</h2>
+            <p class="info-desc">Telegram Stars - bu Telegram ichidagi raqamli valyuta. Uni botlar, kanallar va premium xizmatlar uchun ishlatishingiz mumkin.</p>
+            <div class="info-price">
+                <span class="price-label">Narx:</span>
+                <span class="price-value">200 so'm / 1 star</span>
+            </div>
+        </div>
+
+        <!-- Stars Packages -->
+        <div class="packages-section" style="padding: 1rem; max-width: 600px; margin: 0 auto;">
+            <h3 class="section-title">Paketlarni tanlang</h3>
+            <div class="packages-grid">
+                
+                <div class="package-card" onclick="selectPackage(10, 2000)">
+                    <div class="package-badge">Ommabop</div>
+                    <div class="package-stars">
+                        <i class="fas fa-star"></i>
+                        <span>10</span>
+                    </div>
+                    <div class="package-price">2,000 so'm</div>
+                    <button class="package-btn">Tanlash</button>
+                </div>
+
+                <div class="package-card" onclick="selectPackage(50, 10000)">
+                    <div class="package-stars">
+                        <i class="fas fa-star"></i>
+                        <span>50</span>
+                    </div>
+                    <div class="package-price">10,000 so'm</div>
+                    <button class="package-btn">Tanlash</button>
+                </div>
+
+                <div class="package-card" onclick="selectPackage(100, 20000)">
+                    <div class="package-badge best">Eng yaxshi</div>
+                    <div class="package-stars">
+                        <i class="fas fa-star"></i>
+                        <span>100</span>
+                    </div>
+                    <div class="package-price">20,000 so'm</div>
+                    <button class="package-btn">Tanlash</button>
+                </div>
+
+                <div class="package-card" onclick="selectPackage(500, 100000)">
+                    <div class="package-stars">
+                        <i class="fas fa-star"></i>
+                        <span>500</span>
+                    </div>
+                    <div class="package-price">100,000 so'm</div>
+                    <button class="package-btn">Tanlash</button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script src="../js/telegram.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/ui.js"></script>
+    <script>
+        function goBack() {
+            telegramApp.hapticFeedback('light');
+            window.history.back();
+        }
+
+        function selectPackage(stars, price) {
+            telegramApp.hapticFeedback('medium');
+            
+            // Show confirmation
+            telegramApp.showConfirm(
+                `${stars} ta star sotib olmoqchimisiz? Narx: ${formatCurrency(price)}`,
+                (confirmed) => {
+                    if (confirmed) {
+                        purchaseStars(stars, price);
+                    }
+                }
+            );
+        }
+
+        async function purchaseStars(stars, price) {
+            try {
+                const userData = telegramApp.getUserData();
+                
+                const result = await api.purchaseStars({
+                    user_id: userData.id,
+                    stars: stars,
+                    amount: price
+                });
+                
+                if (result.success) {
+                    telegramApp.notificationOccurred('success');
+                    showToast('Buyurtma qabul qilindi!', 'success');
+                    setTimeout(() => {
+                        window.location.href = '../index.html';
+                    }, 2000);
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                telegramApp.notificationOccurred('error');
+                showToast('Xatolik yuz berdi', 'error');
+            }
+        }
+    </script>
+
+    <style>
+        .back-btn {
+            background: var(--bg-card);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .info-card {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .info-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            margin: 0 auto 1rem;
+        }
+
+        .info-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-desc {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .info-price {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price-label {
+            color: var(--text-secondary);
+        }
+
+        .price-value {
+            font-weight: 700;
+            font-size: 1.125rem;
+        }
+
+        .packages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .package-card {
+            position: relative;
+            background: var(--bg-card);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .package-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .package-badge {
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background: var(--gradient-main);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .package-badge.best {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .package-stars {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 1rem 0;
+        }
+
+        .package-stars i {
+            color: #fbbf24;
+        }
+
+        .package-price {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .package-btn {
+            width: 100%;
+            background: var(--gradient-main);
+            border: none;
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .package-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+
+</body>
+</html>

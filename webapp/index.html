@@ -1,0 +1,2056 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <title>StarPayUz</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0810;
+      --bg-elevated: #120e18;
+      --card: #18121f;
+      --card-hover: #221a2c;
+      --border: rgba(212, 175, 90, 0.1);
+      --text: #f5f0e8;
+      --text-muted: #9a8fa8;
+      --gold: #e4b84a;
+      --gold-dim: #b8923a;
+      --gold-glow: rgba(228, 184, 74, 0.22);
+      --accent: #8b5cf6;
+      --accent-warm: #c17f3a;
+      --accent-hover: #a78bfa;
+      --success: #4ade80;
+      --danger: #fb7185;
+      --radius: 16px;
+      --radius-sm: 12px;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+      --t-fast: 0.15s var(--ease-out);
+      --t-base: 0.28s var(--ease-out);
+      --shadow-hover: 0 10px 28px rgba(0, 0, 0, 0.38);
+      --shadow-gold: 0 8px 32px rgba(228, 184, 74, 0.28);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      min-height: 100dvh;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      padding-bottom: calc(80px + var(--safe-bottom));
+    }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 12px 16px 24px;
+    }
+
+    /* ── Views ── */
+    .view { display: none; animation: fadeIn 0.2s ease; }
+    .view.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-top: 4px;
+    }
+
+    .brand {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .brand-logo-full {
+      height: 55px;
+      width: auto;
+      max-width: min(220px, 58vw);
+      object-fit: contain;
+      object-position: left center;
+      filter: drop-shadow(0 2px 12px rgba(228, 184, 74, 0.15));
+      transition: transform var(--t-base), filter var(--t-base);
+    }
+
+    .balance-widget {
+      display: flex;
+      align-items: center;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 4px 4px 4px 14px;
+      flex-shrink: 0;
+      transition: border-color var(--t-base), box-shadow var(--t-base), background var(--t-base);
+    }
+
+    .balance-amount {
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      margin-right: 6px;
+      color: var(--text);
+    }
+
+    .balance-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .balance-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 50%;
+      background: linear-gradient(145deg, var(--accent-warm), #8b5a2b);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform var(--t-fast), box-shadow var(--t-base), filter var(--t-fast), background var(--t-base);
+    }
+
+    .balance-btn:active { transform: scale(0.92); }
+    .balance-btn.muted {
+      background: var(--bg-elevated);
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    /* ── Alert ── */
+    .alert {
+      display: none;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 14px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .alert.active { display: block; }
+    .alert-success { background: rgba(52, 211, 153, 0.12); color: var(--success); border: 1px solid rgba(52, 211, 153, 0.25); }
+    .alert-error { background: rgba(248, 113, 113, 0.12); color: var(--danger); border: 1px solid rgba(248, 113, 113, 0.25); }
+    .alert-info { background: rgba(139, 92, 246, 0.12); color: var(--accent-hover); border: 1px solid rgba(139, 92, 246, 0.25); }
+
+    /* ── Action grid ── */
+    .action-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .action-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 14px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: background var(--t-base), transform var(--t-base), border-color var(--t-base), box-shadow var(--t-base);
+    }
+
+    .action-card:active { transform: scale(0.97); background: var(--card-hover); }
+
+    .action-icon-wrap {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 12px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      box-shadow:
+        0 4px 14px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      transition: transform var(--t-base), box-shadow var(--t-base), filter var(--t-base), border-color var(--t-base);
+    }
+
+    .action-icon-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 17px;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .action-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      transition: color var(--t-base);
+    }
+
+    /* ── List cards ── */
+    .list-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 14px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: background var(--t-base), transform var(--t-base), border-color var(--t-base), box-shadow var(--t-base);
+    }
+
+    .list-card:active { background: var(--card-hover); }
+
+    .list-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 20px;
+      transition: transform var(--t-base), box-shadow var(--t-base);
+    }
+
+    .list-icon.referral { background: linear-gradient(145deg, #8b5cf6, #5b3d99); }
+    .list-icon.gift-nav { background: linear-gradient(145deg, #e879a9, #9d3d6b); }
+
+    .list-body { flex: 1; min-width: 0; }
+
+    .list-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    .list-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    .pill-btn {
+      flex-shrink: 0;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(145deg, var(--accent-warm), #8b5a2b);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform var(--t-fast), box-shadow var(--t-base), filter var(--t-fast), opacity var(--t-fast);
+    }
+
+    .pill-btn:active { opacity: 0.85; }
+
+    .pill-btn.violet {
+      background: linear-gradient(145deg, var(--accent), #4a3078);
+    }
+
+    /* ── Goal card ── */
+    .goal-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-top: 4px;
+      transition: border-color var(--t-base), box-shadow var(--t-base);
+    }
+
+    .goal-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .goal-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, var(--accent-warm), #6b4423);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .progress-track {
+      height: 6px;
+      background: var(--bg-elevated);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+      border-radius: 999px;
+      transition: width 0.5s ease;
+    }
+
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* ── Sub-page header ── */
+    .sub-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .back-btn {
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card);
+      color: var(--text);
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background var(--t-base), border-color var(--t-base), transform var(--t-fast), box-shadow var(--t-base), color var(--t-base);
+    }
+
+    .sub-title {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .sub-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ── Stars / gifts grids ── */
+    .stars-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .star-card {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform var(--t-base), border-color var(--t-base), background var(--t-base), box-shadow var(--t-base);
+    }
+
+    .star-card.selected {
+      border-color: var(--gold);
+      background: rgba(232, 197, 71, 0.08);
+      box-shadow: 0 0 0 1px var(--gold-glow);
+    }
+
+    .star-count {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+
+    .star-price {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .gifts-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .gift-card {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform var(--t-base), border-color var(--t-base), background var(--t-base), box-shadow var(--t-base);
+    }
+
+    .gift-card.selected {
+      border-color: var(--gold);
+      background: rgba(232, 197, 71, 0.08);
+    }
+
+    .gift-emoji { font-size: 28px; margin-bottom: 6px; }
+    .gift-name { font-size: 10px; font-weight: 600; color: var(--text-muted); }
+
+    .premium-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .premium-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: transform var(--t-base), border-color var(--t-base), background var(--t-base), box-shadow var(--t-base);
+    }
+
+    .premium-card.selected {
+      border-color: var(--gold);
+      background: rgba(232, 197, 71, 0.08);
+    }
+
+    .premium-months { font-size: 16px; font-weight: 800; }
+    .premium-price { font-size: 13px; color: var(--gold); font-weight: 700; }
+
+    .input-group { margin-bottom: 14px; }
+
+    .input-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-family: inherit;
+      background: var(--card);
+      color: var(--text);
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px var(--gold-glow);
+    }
+
+    .input-field::placeholder { color: var(--text-muted); }
+
+    .summary {
+      background: rgba(232, 197, 71, 0.06);
+      border: 1px solid rgba(232, 197, 71, 0.2);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      font-size: 13px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      color: var(--text-muted);
+    }
+
+    .summary-row:last-child {
+      margin-bottom: 0;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+      font-weight: 800;
+      color: var(--gold);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: transform var(--t-fast), box-shadow var(--t-base), filter var(--t-fast), background var(--t-base), border-color var(--t-base);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+      color: #0c0e14;
+      box-shadow: 0 4px 20px var(--gold-glow);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-primary:active:not(:disabled) { transform: scale(0.98); }
+
+    .btn-secondary {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      margin-top: 10px;
+    }
+
+    /* ── Purchase modals ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      padding: 16px;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .purchase-modal {
+      display: none;
+      width: 100%;
+      max-width: 480px;
+      background: #1a2430;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px 20px 16px 16px;
+      padding: 18px 16px 16px;
+      box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.5);
+      animation: modalSlideUp 0.28s var(--ease-out);
+    }
+
+    .purchase-modal.active { display: block; }
+
+    @keyframes modalSlideUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .modal-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color var(--t-fast), background var(--t-fast);
+    }
+
+    .modal-close:active { background: rgba(255, 255, 255, 0.06); }
+
+    .modal-field-username {
+      position: relative;
+      margin-bottom: 10px;
+    }
+
+    .modal-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      font-size: 15px;
+      font-family: inherit;
+      background: #121a24;
+      color: var(--text);
+      transition: border-color var(--t-fast);
+    }
+
+    .modal-input:focus {
+      outline: none;
+      border-color: rgba(90, 143, 204, 0.6);
+    }
+
+    .modal-input::placeholder { color: #6b7a8a; }
+
+    .modal-field-username .modal-input {
+      padding-right: 96px;
+    }
+
+    .modal-self-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 7px 12px;
+      border: none;
+      border-radius: 10px;
+      background: #4a7ab5;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: filter var(--t-fast), transform var(--t-fast);
+    }
+
+    .modal-self-btn:active { transform: translateY(-50%) scale(0.96); filter: brightness(0.92); }
+
+    .modal-input-qty {
+      margin-bottom: 10px;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .modal-select-wrap {
+      position: relative;
+      margin-bottom: 10px;
+    }
+
+    .modal-select {
+      width: 100%;
+      padding: 14px 40px 14px 16px;
+      border: 1px solid rgba(90, 143, 204, 0.55);
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+      background: #121a24;
+      color: var(--text);
+      appearance: none;
+      cursor: pointer;
+    }
+
+    .modal-select-arrow {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+      font-size: 12px;
+    }
+
+    .modal-presets {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .modal-preset {
+      flex: 1;
+      min-width: 0;
+      padding: 10px 4px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      background: #121a24;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+    }
+
+    .modal-preset.active {
+      background: rgba(90, 143, 204, 0.2);
+      border-color: #5a8fcc;
+      color: #fff;
+    }
+
+    .modal-pay-btn {
+      width: 100%;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      border: none;
+      border-radius: 12px;
+      background: #4a7ab5;
+      color: #fff;
+      text-align: left;
+      cursor: default;
+    }
+
+    .modal-pay-title {
+      display: block;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .modal-pay-sub {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0.9;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .modal-buy-btn {
+      min-width: 140px;
+      padding: 14px 22px;
+      border: none;
+      border-radius: 12px;
+      background: #3d4f63;
+      color: rgba(255, 255, 255, 0.45);
+      font-size: 15px;
+      font-weight: 800;
+      font-family: inherit;
+      cursor: not-allowed;
+      transition: background var(--t-base), color var(--t-base), transform var(--t-fast);
+    }
+
+    .modal-buy-btn.ready {
+      background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+      color: #0c0e14;
+      cursor: pointer;
+      box-shadow: 0 4px 16px var(--gold-glow);
+    }
+
+    .modal-buy-btn.ready:active { transform: scale(0.98); }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 12px;
+      margin: 0 -12px;
+      border-bottom: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      transition: background var(--t-base), padding var(--t-base);
+    }
+
+    .history-item:last-child { border-bottom: none; }
+
+    .history-desc { font-size: 13px; font-weight: 600; }
+    .history-date { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+    .history-amount { font-size: 14px; font-weight: 800; }
+    .history-amount.debit { color: var(--danger); }
+    .history-amount.credit { color: var(--success); }
+
+    /* ── Loaders ── */
+    .loading {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--text-muted);
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      border: 3px solid rgba(228, 184, 74, 0.15);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.75s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    }
+
+    .loading-text {
+      margin-top: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      animation: pulseText 1.4s ease-in-out infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @keyframes pulseText {
+      0%, 100% { opacity: 0.45; }
+      50% { opacity: 1; }
+    }
+
+    .loader-dots {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      justify-content: center;
+      height: 28px;
+    }
+
+    .loader-dots span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      animation: dotBounce 1.1s ease-in-out infinite;
+    }
+
+    .loader-dots span:nth-child(2) { animation-delay: 0.15s; }
+    .loader-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes dotBounce {
+      0%, 80%, 100% { transform: scale(0.55); opacity: 0.35; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    .skeleton {
+      background: linear-gradient(
+        90deg,
+        var(--card) 0%,
+        rgba(228, 184, 74, 0.08) 50%,
+        var(--card) 100%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 1.4s ease-in-out infinite;
+      border-radius: var(--radius-sm);
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .skeleton-balance {
+      width: 88px;
+      height: 18px;
+      display: inline-block;
+    }
+
+    #app-splash {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at 50% 30%, #1a1428 0%, var(--bg) 65%);
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+
+    #app-splash.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .splash-logo {
+      width: 72px;
+      height: 72px;
+      border-radius: 18px;
+      object-fit: cover;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 32px rgba(228, 184, 74, 0.25);
+      animation: splashFloat 2.2s ease-in-out infinite;
+    }
+
+    @keyframes splashFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    .splash-title {
+      font-size: 22px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--gold), #fff8e7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 24px;
+    }
+
+    .splash-ring {
+      width: 44px;
+      height: 44px;
+      border: 3px solid rgba(228, 184, 74, 0.12);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+
+    .btn-loading {
+      position: relative;
+      color: transparent !important;
+      pointer-events: none;
+    }
+
+    .btn-loading::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(12, 14, 20, 0.2);
+      border-top-color: #0c0e14;
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+
+    /* ── Referral view ── */
+    .referral-hero {
+      background: linear-gradient(145deg, rgba(139, 92, 246, 0.18), rgba(228, 184, 74, 0.1));
+      border: 1px solid rgba(139, 92, 246, 0.35);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .referral-reward {
+      font-size: 36px;
+      font-weight: 900;
+      color: var(--gold);
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+
+    .referral-reward-sub {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .referral-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .referral-stat {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      text-align: center;
+    }
+
+    .referral-stat-val {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .referral-stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .referral-link-box {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .referral-link-input {
+      flex: 1;
+      min-width: 0;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--card);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-family: inherit;
+    }
+
+    .referral-copy-btn {
+      flex-shrink: 0;
+      padding: 12px 16px;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--accent), #5b3d99);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .referral-steps {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .referral-step {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .referral-step:last-child { margin-bottom: 0; }
+
+    .referral-step-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(139, 92, 246, 0.25);
+      color: var(--accent-hover);
+      font-size: 12px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .topup-info {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .topup-info p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin-bottom: 16px;
+    }
+
+    .topup-big {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 24px;
+      opacity: 0.7;
+    }
+
+    /* ── Footer Navigation ── */
+    .footer-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: 60px;
+      padding-bottom: var(--safe-bottom);
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      flex: 1;
+      height: 60px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color var(--t-base);
+    }
+
+    .nav-item.active {
+      color: var(--gold);
+    }
+
+    .nav-icon {
+      font-size: 20px;
+    }
+
+    /* ── Hover (desktop / pointer) ── */
+    @media (hover: hover) and (pointer: fine) {
+      .nav-item:hover {
+        color: var(--gold);
+      }
+
+      .brand-logo-full:hover {
+        transform: scale(1.03);
+        filter: drop-shadow(0 4px 20px rgba(228, 184, 74, 0.35));
+      }
+
+      .balance-widget:hover {
+        border-color: rgba(228, 184, 74, 0.35);
+        box-shadow: var(--shadow-gold);
+        background: var(--card-hover);
+      }
+
+      .balance-btn:hover {
+        transform: scale(1.08);
+        box-shadow: 0 4px 14px rgba(193, 127, 58, 0.45);
+        filter: brightness(1.1);
+      }
+
+      .balance-btn.muted:hover {
+        background: var(--card-hover);
+        color: var(--gold);
+        border: 1px solid rgba(228, 184, 74, 0.25);
+        box-shadow: none;
+        filter: none;
+      }
+
+      .action-card:hover {
+        transform: translateY(-4px);
+        background: var(--card-hover);
+        border-color: rgba(228, 184, 74, 0.35);
+        box-shadow: var(--shadow-hover);
+      }
+
+      .action-card:hover .action-icon-wrap {
+        transform: scale(1.08);
+        border-color: rgba(228, 184, 74, 0.45);
+        filter: drop-shadow(0 8px 20px rgba(228, 184, 74, 0.35));
+      }
+
+      .action-card:hover .action-label {
+        color: var(--gold);
+      }
+
+      .list-card:hover {
+        transform: translateX(4px);
+        background: var(--card-hover);
+        border-color: rgba(139, 92, 246, 0.35);
+        box-shadow: var(--shadow-hover);
+      }
+
+      .list-card:hover .list-icon {
+        transform: scale(1.08);
+        box-shadow: 0 4px 16px rgba(139, 92, 246, 0.35);
+      }
+
+      .pill-btn:hover {
+        transform: scale(1.05);
+        filter: brightness(1.12);
+        box-shadow: 0 4px 16px rgba(193, 127, 58, 0.4);
+      }
+
+      .pill-btn.violet:hover {
+        box-shadow: 0 4px 16px rgba(139, 92, 246, 0.45);
+      }
+
+      .goal-card:hover {
+        border-color: rgba(228, 184, 74, 0.28);
+        box-shadow: var(--shadow-gold);
+      }
+
+      .back-btn:hover {
+        background: var(--card-hover);
+        border-color: rgba(228, 184, 74, 0.4);
+        color: var(--gold);
+        transform: translateX(-2px);
+        box-shadow: var(--shadow-hover);
+      }
+
+      .star-card:not(.selected):hover,
+      .gift-card:not(.selected):hover,
+      .premium-card:not(.selected):hover {
+        transform: translateY(-3px);
+        border-color: rgba(228, 184, 74, 0.45);
+        background: var(--card-hover);
+        box-shadow: var(--shadow-gold);
+      }
+
+      .star-card.selected:hover,
+      .gift-card.selected:hover,
+      .premium-card.selected:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-gold);
+      }
+
+      .btn-primary:not(:disabled):hover {
+        transform: translateY(-2px);
+        filter: brightness(1.08);
+        box-shadow: 0 8px 28px rgba(228, 184, 74, 0.45);
+      }
+
+      .btn-secondary:hover {
+        background: var(--card-hover);
+        border-color: rgba(228, 184, 74, 0.35);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-hover);
+      }
+
+      .history-item:hover {
+        background: rgba(255, 255, 255, 0.04);
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .input-field:hover {
+        border-color: rgba(228, 184, 74, 0.3);
+      }
+    }
+
+    /* Focus ring (keyboard) */
+    button:focus-visible,
+    .action-card:focus-visible,
+    .list-card:focus-visible,
+    .star-card:focus-visible,
+    .gift-card:focus-visible,
+    .premium-card:focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app-splash">
+    <img src="/assets/logo.png" alt="" class="splash-logo" width="72" height="72" />
+    <div class="splash-title">StarPayUz</div>
+    <div class="splash-ring"></div>
+  </div>
+
+  <div class="app">
+    <div id="alert" class="alert"></div>
+
+    <!-- ═══ HOME ═══ -->
+    <div id="view-home" class="view active">
+      <header class="topbar">
+        <div class="brand">
+          <img src="/assets/logo.png" alt="StarPayUz — Premium Network" class="brand-logo-full" />
+        </div>
+        <div class="balance-widget">
+          <span class="balance-amount" id="headerBalance">0 so'm</span>
+          <div class="balance-actions">
+            <button type="button" class="balance-btn muted" onclick="showView('history')" title="Tarix">≡</button>
+            <button type="button" class="balance-btn" onclick="openTopupModal()" title="Пополнить">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <div class="action-grid">
+        <div class="action-card" onclick="openPurchaseModal('stars')">
+          <div class="action-icon-wrap">
+            <img src="/assets/icon-premium.png" alt="Telegram Stars" class="action-icon-img" width="72" height="72" />
+          </div>
+          <div class="action-label">Stars olish</div>
+        </div>
+        <div class="action-card" onclick="openPurchaseModal('premium')">
+          <div class="action-icon-wrap">
+            <img src="/assets/icon-stars.png" alt="Telegram Premium" class="action-icon-img" width="72" height="72" />
+          </div>
+          <div class="action-label">Premium olish</div>
+        </div>
+      </div>
+
+      <div class="list-card" onclick="showView('gifts')">
+        <div class="list-icon gift-nav">🎁</div>
+        <div class="list-body">
+          <div class="list-title">Sovg'a yuborish</div>
+          <div class="list-sub">Do'stlaringizga gift yuboring</div>
+        </div>
+        <button type="button" class="pill-btn" onclick="event.stopPropagation(); showView('gifts')">Tanlash</button>
+      </div>
+
+      <div class="list-card" onclick="showView('referral')">
+        <div class="list-icon referral">↗</div>
+        <div class="list-body">
+          <div class="list-title">Referral orqali daromad</div>
+          <div class="list-sub" id="referralHomeHint">Har bir do'st uchun 50 so'm</div>
+        </div>
+        <button type="button" class="pill-btn violet" onclick="event.stopPropagation(); showView('referral')">Ulashish</button>
+      </div>
+
+      <div class="goal-card">
+        <div class="goal-header">
+          <div class="goal-icon">🎁</div>
+          <div>
+            <div class="list-title">Umumiy savdo maqsadi</div>
+            <div class="list-sub">Tez kunda yangicha ko'rinishda.</div>
+          </div>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="goalProgress"></div>
+        </div>
+        <div class="progress-labels">
+          <span id="goalCurrent">0 so'm</span>
+          <span id="goalTarget">1 200 000 so'm</span>
+        </div>
+      </div>
+
+      <p class="footer-note">© StarPayUz · Telegram Stars & Premium</p>
+    </div>
+
+    <!-- ═══ REFERRAL ═══ -->
+    <div id="view-referral" class="view">
+      <div class="sub-header">
+        <button type="button" class="back-btn" onclick="showView('home')">←</button>
+        <div>
+          <div class="sub-title">Referral dasturi</div>
+          <div class="sub-subtitle">Do'stlarni taklif qiling</div>
+        </div>
+      </div>
+      <div id="referralContent">
+        <div class="loading" id="referralLoading">
+          <div class="loader-dots"><span></span><span></span><span></span></div>
+          <p class="loading-text">Ma'lumot yuklanmoqda...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ GIFTS ═══ -->
+    <div id="view-gifts" class="view">
+      <div class="sub-header">
+        <button type="button" class="back-btn" onclick="showView('home')">←</button>
+        <div>
+          <div class="sub-title">Sovg'a yuborish</div>
+          <div class="sub-subtitle" id="giftsBalanceHint">Balans: 0 so'm</div>
+        </div>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Qabul qiluvchi username</label>
+        <input type="text" id="giftUsername" class="input-field" placeholder="@username" oninput="updateGiftSummary()" />
+      </div>
+      <div class="gifts-grid" id="giftsGrid"></div>
+      <div class="summary" id="giftsSummary" style="display:none;">
+        <div class="summary-row"><span>Qabul qiluvchi</span><span id="summaryGiftUser">—</span></div>
+        <div class="summary-row"><span>Sovg'a</span><span id="summaryGiftName">—</span></div>
+        <div class="summary-row"><span>Narx</span><span id="summaryGiftPrice">50 000 so'm</span></div>
+      </div>
+      <button class="btn btn-primary" id="sendGiftBtn" onclick="sendGift()" disabled>Sovg'a yuborish</button>
+    </div>
+
+    <!-- ═══ HISTORY ═══ -->
+    <div id="view-history" class="view">
+      <div class="sub-header">
+        <button type="button" class="back-btn" onclick="showView('home')">←</button>
+        <div>
+          <div class="sub-title">Tranzaksiyalar</div>
+          <div class="sub-subtitle">So'nggi operatsiyalar</div>
+        </div>
+      </div>
+      <div id="historyList"></div>
+      <div class="loading" id="historyLoading" style="display:none;">
+        <div class="loader-dots"><span></span><span></span><span></span></div>
+        <p class="loading-text">Tarix yuklanmoqda...</p>
+      </div>
+    </div>
+
+    <!-- ═══ TOPUP ═══ -->
+    <div id="view-topup" class="view">
+      <div class="sub-header">
+        <button type="button" class="back-btn" onclick="showView('home')">←</button>
+        <div>
+          <div class="sub-title">Balans to'ldirish</div>
+          <div class="sub-subtitle">To'lov bot orqali amalga oshiriladi</div>
+        </div>
+      </div>
+      <div class="topup-info">
+        <div class="topup-big" id="topupBalance">0 so'm</div>
+        <p>Balansni to'ldirish uchun botdagi <b>«Balans to'ldirish»</b> bo'limidan foydalaning. To'lovdan keyin bu yerda balans yangilanadi.</p>
+        <button class="btn btn-primary" onclick="closeApp()">Botga qaytish</button>
+        <button class="btn btn-secondary" onclick="loadBalance(); showAlert('Balans yangilandi', 'success')">Balansni yangilash</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Purchase modals ═══ -->
+  <div id="modal-overlay" class="modal-overlay" onclick="closePurchaseModal()">
+    <div id="modal-stars" class="purchase-modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">Stars sotib olish</h2>
+        <button type="button" class="modal-close" onclick="closePurchaseModal()" aria-label="Yopish">×</button>
+      </div>
+      <div class="modal-field modal-field-username">
+        <input type="text" id="starsModalUsername" class="modal-input" placeholder="Username" oninput="updateStarsModal()" />
+        <button type="button" class="modal-self-btn" onclick="fillSelfUsername('starsModalUsername')">O'zimga</button>
+      </div>
+      <input type="number" id="starsModalQty" class="modal-input modal-input-qty" value="50" min="50" max="5000" step="1" oninput="onStarsQtyInput()" />
+      <div class="modal-presets" id="starsModalPresets"></div>
+      <div class="modal-pay-btn" aria-hidden="true">
+        <span class="modal-pay-title">Balans orqali</span>
+        <span class="modal-pay-sub" id="starsModalBalance">Balansingiz: 0 so'm</span>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="modal-buy-btn" id="starsModalBuyBtn" onclick="buyStarsFromModal()" disabled>0 so'm</button>
+      </div>
+    </div>
+
+    <div id="modal-premium" class="purchase-modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">Premium sotib olish</h2>
+        <button type="button" class="modal-close" onclick="closePurchaseModal()" aria-label="Yopish">×</button>
+      </div>
+      <div class="modal-field modal-field-username">
+        <input type="text" id="premiumModalUsername" class="modal-input" placeholder="Username" oninput="updatePremiumModal()" />
+        <button type="button" class="modal-self-btn" onclick="fillSelfUsername('premiumModalUsername')">O'zimga</button>
+      </div>
+      <div class="modal-select-wrap">
+        <select id="premiumModalMonths" class="modal-select" onchange="updatePremiumModal()">
+          <option value="3">3 oy</option>
+          <option value="6">6 oy</option>
+          <option value="12">12 oy</option>
+        </select>
+        <span class="modal-select-arrow">▼</span>
+      </div>
+      <div class="modal-pay-btn" aria-hidden="true">
+        <span class="modal-pay-title">Balans orqali</span>
+        <span class="modal-pay-sub" id="premiumModalBalance">Balansingiz: 0 so'm</span>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="modal-buy-btn" id="premiumModalBuyBtn" onclick="buyPremiumFromModal()" disabled>Sotib olish</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    const GOAL_UZS = 1200000;
+
+    const STARS_PRESETS = [50, 100, 200, 500, 1000];
+
+    const state = {
+      userId: null,
+      username: null,
+      balance: 0,
+      totalSpentEstimate: 0,
+      referralCode: null,
+      referral: null,
+      modalOpen: null,
+      modalStarsQty: 50,
+      starPackages: [],
+      selectedGift: null,
+      starPrice: 195,
+      giftPrice: 50000,
+      premiumPlans: [
+        { months: 3, price: 160000, label: '3 oy' },
+        { months: 6, price: 220000, label: '6 oy' },
+        { months: 12, price: 380000, label: '12 oy' },
+      ],
+      gifts: {
+        bear: '🐻', heart: '❤️', gift: '🎁', rose: '🌹', cake: '🎂',
+        flower: '🌸', rocket: '🚀', ring: '💍', diamond: '💎',
+      },
+    };
+
+    function applyTheme() {
+      const bg = '#0a0810';
+      document.documentElement.style.setProperty('--bg', bg);
+      if (tg.setHeaderColor) tg.setHeaderColor(bg);
+      if (tg.setBackgroundColor) tg.setBackgroundColor(bg);
+    }
+
+    function formatUzs(n) {
+      return `${Number(n || 0).toLocaleString('uz-UZ')} so'm`;
+    }
+
+    function updateBalanceUI() {
+      const text = formatUzs(state.balance);
+      const balLine = `Balansingiz: ${text}`;
+      document.getElementById('headerBalance').textContent = text;
+      document.getElementById('giftsBalanceHint').textContent = `Balans: ${text}`;
+      document.getElementById('topupBalance').textContent = text;
+      const starsBal = document.getElementById('starsModalBalance');
+      const premBal = document.getElementById('premiumModalBalance');
+      if (starsBal) starsBal.textContent = balLine;
+      if (premBal) premBal.textContent = balLine;
+
+      const pct = Math.min(100, (state.totalSpentEstimate / GOAL_UZS) * 100);
+      document.getElementById('goalProgress').style.width = `${pct}%`;
+      document.getElementById('goalCurrent').textContent = formatUzs(state.totalSpentEstimate);
+
+      if (state.modalOpen === 'stars') updateStarsModal();
+      if (state.modalOpen === 'premium') updatePremiumModal();
+    }
+
+    function getStarsPrice(qty) {
+      const n = parseInt(qty, 10);
+      if (!n || n < 50) return 0;
+      const pkg = state.starPackages.find((p) => p.stars === n);
+      return pkg ? pkg.price_uzs : Math.ceil(n * state.starPrice);
+    }
+
+    function getPremiumPlan(months) {
+      return state.premiumPlans.find((p) => p.months === parseInt(months, 10));
+    }
+
+    function hideSplash() {
+      const splash = document.getElementById('app-splash');
+      if (splash) splash.classList.add('hidden');
+    }
+
+    function parseStartParam() {
+      const raw = tg.initDataUnsafe?.start_param || '';
+      if (!raw) return null;
+      const m = String(raw).trim().match(/^ref[_-]?(\d+)$/i);
+      if (m) return `ref_${m[1]}`;
+      if (/^\d+$/.test(String(raw).trim())) return `ref_${String(raw).trim()}`;
+      return String(raw).trim() || null;
+    }
+
+    function setButtonLoading(btn, loading) {
+      if (!btn) return;
+      btn.classList.toggle('btn-loading', loading);
+      btn.disabled = loading;
+    }
+
+    function showView(name) {
+      closePurchaseModal();
+      document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
+      document.getElementById(`view-${name}`).classList.add('active');
+      if (name === 'history') loadHistory();
+      if (name === 'referral') loadReferral();
+      tg.BackButton[name === 'home' ? 'hide' : 'show']();
+    }
+
+    function openPurchaseModal(type) {
+      state.modalOpen = type;
+      document.getElementById('modal-overlay').classList.add('active');
+      document.getElementById('modal-stars').classList.toggle('active', type === 'stars');
+      document.getElementById('modal-premium').classList.toggle('active', type === 'premium');
+
+      if (type === 'stars') {
+        state.modalStarsQty = 50;
+        document.getElementById('starsModalQty').value = '50';
+        document.getElementById('starsModalUsername').value = '';
+        renderStarsPresets();
+        updateStarsModal();
+      } else {
+        document.getElementById('premiumModalUsername').value = '';
+        document.getElementById('premiumModalMonths').value = '3';
+        updatePremiumModal();
+      }
+
+      if (tg.BackButton) tg.BackButton.show();
+    }
+
+    function closePurchaseModal() {
+      state.modalOpen = null;
+      document.getElementById('modal-overlay').classList.remove('active');
+      document.getElementById('modal-stars').classList.remove('active');
+      document.getElementById('modal-premium').classList.remove('active');
+      const onHome = document.getElementById('view-home')?.classList.contains('active');
+      if (tg.BackButton && onHome) tg.BackButton.hide();
+    }
+
+    function fillSelfUsername(inputId) {
+      const input = document.getElementById(inputId);
+      if (!state.username) {
+        showAlert('Telegram username yo\'q', 'error');
+        return;
+      }
+      input.value = state.username;
+      if (inputId === 'starsModalUsername') updateStarsModal();
+      else updatePremiumModal();
+    }
+
+    function renderStarsPresets() {
+      document.getElementById('starsModalPresets').innerHTML = STARS_PRESETS.map((q) => `
+        <button type="button" class="modal-preset${state.modalStarsQty === q ? ' active' : ''}" onclick="setStarsPreset(${q})">${q}</button>
+      `).join('');
+    }
+
+    function setStarsPreset(qty) {
+      state.modalStarsQty = qty;
+      document.getElementById('starsModalQty').value = String(qty);
+      renderStarsPresets();
+      updateStarsModal();
+    }
+
+    function onStarsQtyInput() {
+      let qty = parseInt(document.getElementById('starsModalQty').value, 10);
+      if (Number.isNaN(qty)) qty = 50;
+      qty = Math.min(5000, Math.max(50, qty));
+      state.modalStarsQty = qty;
+      document.getElementById('starsModalQty').value = String(qty);
+      renderStarsPresets();
+      updateStarsModal();
+    }
+
+    function updateStarsModal() {
+      const total = getStarsPrice(state.modalStarsQty);
+      const btn = document.getElementById('starsModalBuyBtn');
+      const canBuy = total > 0 && state.balance >= total && state.userId;
+      btn.textContent = formatUzs(total);
+      btn.disabled = !canBuy;
+      btn.classList.toggle('ready', canBuy);
+    }
+
+    function updatePremiumModal() {
+      const plan = getPremiumPlan(document.getElementById('premiumModalMonths').value);
+      const username = document.getElementById('premiumModalUsername').value.trim().replace('@', '');
+      const btn = document.getElementById('premiumModalBuyBtn');
+      if (!plan) {
+        btn.disabled = true;
+        btn.classList.remove('ready');
+        return;
+      }
+      const canBuy = !!username && state.balance >= plan.price && state.userId;
+      btn.disabled = !canBuy;
+      btn.classList.toggle('ready', canBuy);
+    }
+
+    if (tg.BackButton) {
+      tg.BackButton.onClick(() => {
+        if (state.modalOpen) {
+          closePurchaseModal();
+          return;
+        }
+        const active = document.querySelector('.view.active');
+        if (active && active.id !== 'view-home') showView('home');
+        else tg.close();
+      });
+    }
+
+    function closeApp() {
+      tg.close();
+    }
+
+    async function init() {
+      applyTheme();
+      state.referralCode = parseStartParam();
+
+      const balanceEl = document.getElementById('headerBalance');
+      if (balanceEl) balanceEl.innerHTML = '<span class="skeleton skeleton-balance"></span>';
+
+      const user = tg.initDataUnsafe?.user;
+      try {
+        if (user) {
+          state.userId = user.id;
+          state.username = user.username || null;
+          await registerUser(user);
+        }
+        await Promise.all([loadBalance(), loadPrices()]);
+        renderGifts();
+        updateBalanceUI();
+      } finally {
+        hideSplash();
+      }
+    }
+
+    async function loadPrices() {
+      try {
+        const res = await fetch('/api/bot/prices');
+        const data = await res.json();
+        if (data.success && data.data?.packages?.length) {
+          state.starPackages = data.data.packages;
+          const first = data.data.packages[0];
+          state.starPrice = Math.round(first.price_uzs / first.stars);
+        }
+      } catch (_) {}
+    }
+
+    async function registerUser(user) {
+      try {
+        const res = await fetch('/api/bot/user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            telegram_id: state.userId,
+            username: user.username,
+            full_name: [user.first_name, user.last_name].filter(Boolean).join(' '),
+            referral_code: state.referralCode || undefined,
+          }),
+        });
+        const data = await res.json();
+        if (data.success && data.data) {
+          state.referral = {
+            referrals_count: data.data.referrals_count || 0,
+            referral_earnings_uzs: data.data.referral_earnings_uzs || 0,
+            reward_per_invite_uzs: data.data.referral_reward_uzs || 50,
+          };
+          updateReferralHomeHint();
+        }
+      } catch (_) {}
+    }
+
+    function updateReferralHomeHint() {
+      const hint = document.getElementById('referralHomeHint');
+      if (!hint || !state.referral) return;
+      const earned = state.referral.referral_earnings_uzs || 0;
+      if (earned > 0) {
+        hint.textContent = `Jami: ${formatUzs(earned)}`;
+      }
+    }
+
+    async function loadReferral() {
+      const container = document.getElementById('referralContent');
+      if (!state.userId) {
+        container.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:24px;">Telegram orqali kiring</p>';
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="loading" id="referralLoading">
+          <div class="loader-dots"><span></span><span></span><span></span></div>
+          <p class="loading-text">Ma'lumot yuklanmoqda...</p>
+        </div>`;
+
+      try {
+        const res = await fetch(`/api/bot/referral?telegram_id=${state.userId}`);
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Xatolik');
+
+        const r = data.data;
+        state.referral = r;
+        updateReferralHomeHint();
+
+        container.innerHTML = `
+          <div class="referral-hero">
+            <div class="referral-reward">+${r.reward_per_invite_uzs.toLocaleString()} so'm</div>
+            <div class="referral-reward-sub">Har bir yangi foydalanuvchi uchun</div>
+          </div>
+          <div class="referral-stats">
+            <div class="referral-stat">
+              <div class="referral-stat-val" id="refCount">${r.referrals_count}</div>
+              <div class="referral-stat-label">Takliflar</div>
+            </div>
+            <div class="referral-stat">
+              <div class="referral-stat-val" id="refEarned">${formatUzs(r.referral_earnings_uzs)}</div>
+              <div class="referral-stat-label">Daromad</div>
+            </div>
+          </div>
+          <div class="referral-steps">
+            <div class="referral-step">
+              <span class="referral-step-num">1</span>
+              <span>Referral havolangizni do'stlaringizga yuboring</span>
+            </div>
+            <div class="referral-step">
+              <span class="referral-step-num">2</span>
+              <span>Do'stingiz havola orqali ro'yxatdan o'tsa, sizga <b>${r.reward_per_invite_uzs} so'm</b> beriladi</span>
+            </div>
+            <div class="referral-step">
+              <span class="referral-step-num">3</span>
+              <span>Bonus balansingizga darhol tushadi</span>
+            </div>
+          </div>
+          <div class="referral-link-box">
+            <input type="text" class="referral-link-input" id="referralLinkInput" readonly value="${r.share_link}" />
+            <button type="button" class="referral-copy-btn" onclick="copyReferralLink()">Nusxa</button>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="shareReferralLink()">📤 Do'stlarga ulashish</button>
+        `;
+      } catch (e) {
+        container.innerHTML = `<p style="color:var(--danger);text-align:center;padding:20px;">${e.message}</p>`;
+      }
+    }
+
+    function copyReferralLink() {
+      const input = document.getElementById('referralLinkInput');
+      if (!input?.value) return;
+      navigator.clipboard?.writeText(input.value).then(() => {
+        showAlert('Havola nusxalandi!', 'success');
+      }).catch(() => {
+        input.select();
+        document.execCommand('copy');
+        showAlert('Havola nusxalandi!', 'success');
+      });
+    }
+
+    function shareReferralLink() {
+      const link = document.getElementById('referralLinkInput')?.value || state.referral?.share_link;
+      if (!link) return;
+      const text = `StarPayUz — Telegram Stars va Premium! Ro'yxatdan o'ting, men ${state.referral?.reward_per_invite_uzs || 50} so'm olaman 😊`;
+      if (tg.openTelegramLink) {
+        tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`);
+      } else if (navigator.share) {
+        navigator.share({ title: 'StarPayUz', text, url: link });
+      } else {
+        copyReferralLink();
+      }
+    }
+
+    async function loadBalance() {
+      if (!state.userId) return;
+      try {
+        const res = await fetch('/api/bot/balance', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ telegram_id: state.userId }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          state.balance = data.data.balance_uzs || 0;
+          const starsBought = data.data.total_stars_bought || 0;
+          state.totalSpentEstimate = starsBought * state.starPrice;
+          if (data.data.referral_earnings_uzs != null) {
+            state.referral = state.referral || {};
+            state.referral.referral_earnings_uzs = data.data.referral_earnings_uzs;
+            state.referral.referrals_count = data.data.referrals_count || 0;
+          }
+          updateReferralHomeHint();
+          updateBalanceUI();
+        }
+      } catch (_) {
+        showAlert('Balans yuklanmadi', 'error');
+      }
+    }
+
+    async function buyStarsFromModal() {
+      const qty = state.modalStarsQty;
+      const total = getStarsPrice(qty);
+      if (!qty || state.balance < total) {
+        showAlert('Balans yetarli emas', 'error');
+        return;
+      }
+      const username = document.getElementById('starsModalUsername').value.trim().replace('@', '') || state.username || '';
+      const btn = document.getElementById('starsModalBuyBtn');
+      setButtonLoading(btn, true);
+      showAlert('Jarayon...', 'info');
+      try {
+        const body = { telegram_id: state.userId, stars_count: qty };
+        if (username) body.username = username;
+        const res = await fetch('/api/bot/buy-stars', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (data.success) {
+          showAlert(`✅ ${qty} ta Stars yuborildi!`, 'success');
+          closePurchaseModal();
+          await loadBalance();
+        } else {
+          showAlert(data.error || 'Xatolik', 'error');
+          updateStarsModal();
+        }
+      } catch (e) {
+        showAlert('Xatolik: ' + e.message, 'error');
+        updateStarsModal();
+      } finally {
+        setButtonLoading(btn, false);
+        updateStarsModal();
+      }
+    }
+
+    async function buyPremiumFromModal() {
+      const username = document.getElementById('premiumModalUsername').value.trim().replace('@', '');
+      const plan = getPremiumPlan(document.getElementById('premiumModalMonths').value);
+      if (!username || !plan) return;
+      if (state.balance < plan.price) {
+        showAlert('Balans yetarli emas', 'error');
+        return;
+      }
+      const btn = document.getElementById('premiumModalBuyBtn');
+      setButtonLoading(btn, true);
+      showAlert('Premium yuborilmoqda...', 'info');
+      try {
+        const res = await fetch('/api/bot/buy-premium', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            telegram_id: state.userId,
+            username,
+            months: plan.months,
+            price: plan.price,
+          }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          showAlert(`✅ @${username} ga Premium yuborildi!`, 'success');
+          closePurchaseModal();
+          await loadBalance();
+        } else {
+          showAlert(data.error || 'Xatolik', 'error');
+          updatePremiumModal();
+        }
+      } catch (e) {
+        showAlert('Xatolik: ' + e.message, 'error');
+        updatePremiumModal();
+      } finally {
+        setButtonLoading(btn, false);
+        updatePremiumModal();
+      }
+    }
+
+    function renderGifts() {
+      document.getElementById('giftsGrid').innerHTML = Object.entries(state.gifts).map(([name, emoji]) => `
+        <div class="gift-card" onclick="selectGift('${name}', this)">
+          <div class="gift-emoji">${emoji}</div>
+          <div class="gift-name">${name}</div>
+        </div>
+      `).join('');
+    }
+
+    function selectGift(name, el) {
+      state.selectedGift = name;
+      document.querySelectorAll('.gift-card').forEach((c) => c.classList.remove('selected'));
+      el.classList.add('selected');
+      updateGiftSummary();
+    }
+
+    function updateGiftSummary() {
+      const username = document.getElementById('giftUsername').value.trim().replace('@', '');
+      if (state.selectedGift && username) {
+        document.getElementById('giftsSummary').style.display = 'block';
+        document.getElementById('summaryGiftUser').textContent = `@${username}`;
+        document.getElementById('summaryGiftName').textContent = state.gifts[state.selectedGift];
+        document.getElementById('sendGiftBtn').disabled = state.balance < state.giftPrice;
+      } else {
+        document.getElementById('giftsSummary').style.display = 'none';
+        document.getElementById('sendGiftBtn').disabled = true;
+      }
+    }
+
+    async function sendGift() {
+      const username = document.getElementById('giftUsername').value.trim().replace('@', '');
+      if (!state.selectedGift || !username) return;
+      if (state.balance < state.giftPrice) {
+        showAlert('Balans yetarli emas', 'error');
+        return;
+      }
+      const btn = document.getElementById('sendGiftBtn');
+      setButtonLoading(btn, true);
+      showAlert('Sovg\'a yuborilmoqda...', 'info');
+      try {
+        const res = await fetch('/api/bot/send-gift', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            telegram_id: state.userId,
+            target_username: username,
+            gift_name: state.selectedGift,
+          }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          showAlert(`✅ Sovg'a @${username} ga yuborildi!`, 'success');
+          state.selectedGift = null;
+          document.getElementById('giftUsername').value = '';
+          document.getElementById('giftsSummary').style.display = 'none';
+          document.querySelectorAll('.gift-card').forEach((c) => c.classList.remove('selected'));
+          await loadBalance();
+        } else {
+          showAlert(data.error || 'Xatolik', 'error');
+        }
+      } catch (e) {
+        showAlert('Xatolik: ' + e.message, 'error');
+      } finally {
+        setButtonLoading(btn, false);
+        updateGiftSummary();
+      }
+    }
+
+    async function loadHistory() {
+      const list = document.getElementById('historyList');
+      const loading = document.getElementById('historyLoading');
+      loading.style.display = 'block';
+      list.innerHTML = '';
+      try {
+        const res = await fetch(`/api/bot/transactions?telegram_id=${state.userId}&limit=15`);
+        const data = await res.json();
+        loading.style.display = 'none';
+        if (data.success && data.data?.length > 0) {
+          list.innerHTML = data.data.map((tx) => `
+            <div class="history-item">
+              <div>
+                <div class="history-desc">${tx.type === 'debit' ? '📤' : '📥'} ${tx.description || tx.type}</div>
+                <div class="history-date">${new Date(tx.created_at).toLocaleString('uz-UZ')}</div>
+              </div>
+              <div class="history-amount ${tx.type === 'debit' ? 'debit' : 'credit'}">
+                ${tx.type === 'debit' ? '−' : '+'} ${Number(tx.amount).toLocaleString()} so'm
+              </div>
+            </div>
+          `).join('');
+        } else {
+          list.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:24px;">Tarix bo\'sh</p>';
+        }
+      } catch (_) {
+        loading.style.display = 'none';
+        list.innerHTML = '<p style="color:var(--danger);padding:12px;">Yuklash xatosi</p>';
+      }
+    }
+
+    function showAlert(message, type = 'info') {
+      const alert = document.getElementById('alert');
+      alert.textContent = message;
+      alert.className = `alert active alert-${type}`;
+      setTimeout(() => alert.classList.remove('active'), 3200);
+    }
+
+    window.addEventListener('load', init);
+  </script>
+
+  <!-- ═══ Footer Navigation ═══ -->
+  <div class="footer-nav">
+    <a class="nav-item active" href="/" onclick="navigateTo('home', event)" data-page="home">
+      <i class="nav-icon fas fa-home"></i>
+      <span data-i18n="home">Асосий</span>
+    </a>
+    <a class="nav-item" href="/orders" onclick="navigateTo('orders', event)" data-page="orders">
+      <i class="nav-icon fas fa-shopping-bag"></i>
+      <span data-i18n="orders">Буюртмалар</span>
+    </a>
+    <a class="nav-item" href="/leaderboard" onclick="navigateTo('leaderboard', event)" data-page="leaderboard">
+      <i class="nav-icon fas fa-trophy"></i>
+      <span data-i18n="leaderboard">Рейтинг</span>
+    </a>
+    <a class="nav-item" href="/settings" onclick="navigateTo('settings', event)" data-page="settings">
+      <i class="nav-icon fas fa-cog"></i>
+      <span data-i18n="settings">Созламалар</span>
+    </a>
+  </div>
+
+  <!-- Multilingual Support -->
+  <script src="/js/i18n.js"></script>
+
+  <!-- App Enhancements -->
+  <script src="/js/app-enhancements.js"></script>
+</body>
+</html>
