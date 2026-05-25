@@ -4,9 +4,17 @@
     {
       "src": "server.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "webapp/**/*",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
+    {
+      "src": "/webapp/(.*)",
+      "dest": "/webapp/$1"
+    },
     {
       "src": "/(.*)",
       "dest": "server.js"
