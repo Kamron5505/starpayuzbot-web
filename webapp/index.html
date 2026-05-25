@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
   <title>StarPayUz</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
@@ -98,11 +97,23 @@
       padding: 20px 14px 16px;
       text-align: center;
       cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .action-card:active {
+      transform: scale(0.97);
+      background: rgba(212, 175, 90, 0.1);
     }
     
     .action-icon {
       font-size: 40px;
       margin-bottom: 12px;
+    }
+    
+    .action-icon img {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
     }
     
     .action-label {
@@ -120,6 +131,12 @@
       padding: 14px;
       margin-bottom: 10px;
       cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .list-card:active {
+      transform: scale(0.98);
+      background: rgba(212, 175, 90, 0.1);
     }
     
     .list-icon {
@@ -193,6 +210,174 @@
       margin-top: 24px;
       opacity: 0.7;
     }
+    
+    .sub-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .back-btn {
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card);
+      color: var(--text);
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .sub-title {
+      font-size: 18px;
+      font-weight: 800;
+    }
+    
+    .sub-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    
+    .content-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .content-card:active {
+      transform: scale(0.97);
+      background: rgba(212, 175, 90, 0.1);
+    }
+    
+    .content-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+    }
+    
+    .content-label {
+      font-size: 13px;
+      font-weight: 700;
+    }
+    
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+    
+    .rank-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    
+    .rank-1 { background: linear-gradient(145deg, #ffd700, #ffed4e); color: #000; }
+    .rank-2 { background: linear-gradient(145deg, #c0c0c0, #e8e8e8); color: #000; }
+    .rank-3 { background: linear-gradient(145deg, #cd7f32, #e8a76a); color: #fff; }
+    
+    .leaderboard-info {
+      flex: 1;
+    }
+    
+    .leaderboard-name {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    
+    .leaderboard-amount {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    
+    .leaderboard-value {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    
+    .filter-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    
+    .filter-tab {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .filter-tab.active {
+      background: var(--gold);
+      color: #000;
+      border-color: var(--gold);
+    }
+    
+    .settings-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+    
+    .settings-label {
+      font-size: 14px;
+      font-weight: 700;
+    }
+    
+    .settings-value {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    
+    .language-select {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--card);
+      color: var(--text);
+      font-size: 12px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -210,17 +395,21 @@
       </div>
       
       <div class="action-grid">
-        <div class="action-card" onclick="showView('stars')">
-          <div class="action-icon">⭐</div>
+        <div class="action-card" onclick="navigateTo('stars')">
+          <div class="action-icon">
+            <img src="/assets/assets/icon-stars.png" alt="Stars" onerror="this.parentElement.textContent='⭐'">
+          </div>
           <div class="action-label">Stars olish</div>
         </div>
-        <div class="action-card" onclick="showView('premium')">
-          <div class="action-icon">💎</div>
+        <div class="action-card" onclick="navigateTo('premium')">
+          <div class="action-icon">
+            <img src="/assets/assets/icon-premium.png" alt="Premium" onerror="this.parentElement.textContent='💎'">
+          </div>
           <div class="action-label">Premium olish</div>
         </div>
       </div>
       
-      <div class="list-card" onclick="showView('gifts')">
+      <div class="list-card" onclick="navigateTo('gifts')">
         <div class="list-icon">🎁</div>
         <div class="list-body">
           <div class="list-title">Sovg'a yuborish</div>
@@ -229,7 +418,7 @@
         <button class="pill-btn" onclick="event.stopPropagation()">Tanlash</button>
       </div>
       
-      <div class="list-card" onclick="showView('referral')">
+      <div class="list-card" onclick="navigateTo('referral')">
         <div class="list-icon">↗</div>
         <div class="list-body">
           <div class="list-title">Referral orqali daromad</div>
@@ -243,30 +432,232 @@
     
     <!-- ═══ STARS VIEW ═══ -->
     <div id="view-stars" class="view">
-      <h2>Stars olish</h2>
-      <p>Stars page content</p>
-      <button onclick="showView('home')">← Orqaga</button>
+      <div class="sub-header">
+        <button class="back-btn" onclick="navigateTo('home')">←</button>
+        <div>
+          <div class="sub-title">Stars olish</div>
+          <div class="sub-subtitle">Telegram Stars xizmati</div>
+        </div>
+      </div>
+      
+      <div class="content-grid">
+        <div class="content-card">
+          <div class="content-icon">⭐</div>
+          <div class="content-label">50 Stars</div>
+          <div style="font-size: 12px; color: var(--gold); margin-top: 4px;">9,750 so'm</div>
+        </div>
+        <div class="content-card">
+          <div class="content-icon">⭐</div>
+          <div class="content-label">100 Stars</div>
+          <div style="font-size: 12px; color: var(--gold); margin-top: 4px;">19,500 so'm</div>
+        </div>
+        <div class="content-card">
+          <div class="content-icon">⭐</div>
+          <div class="content-label">500 Stars</div>
+          <div style="font-size: 12px; color: var(--gold); margin-top: 4px;">97,500 so'm</div>
+        </div>
+        <div class="content-card">
+          <div class="content-icon">⭐</div>
+          <div class="content-label">1000 Stars</div>
+          <div style="font-size: 12px; color: var(--gold); margin-top: 4px;">195,000 so'm</div>
+        </div>
+      </div>
     </div>
     
     <!-- ═══ PREMIUM VIEW ═══ -->
     <div id="view-premium" class="view">
-      <h2>Premium olish</h2>
-      <p>Premium page content</p>
-      <button onclick="showView('home')">← Orqaga</button>
+      <div class="sub-header">
+        <button class="back-btn" onclick="navigateTo('home')">←</button>
+        <div>
+          <div class="sub-title">Premium olish</div>
+          <div class="sub-subtitle">Telegram Premium xizmati</div>
+        </div>
+      </div>
+      
+      <div class="content-grid">
+        <div class="content-card">
+          <div class="content-icon">💎</div>
+          <div class="content-label">1 oy</div>
+          <div style="font-size: 12px; color: var(--gold); margin-top: 4px;">45,000 so'm</div>
+        </div>
+        <div class="content-card">
+          <div class="content-icon">💎</div>
+          <div class="content-label">3 oy</div>
+          <div style="font-size: 12px; color: var(--gold); margin-top: 4px;">160,000 so'm</div>
+        </div>
+        <div class="content-card">
+          <div class="content-icon">💎</div>
+          <div class="content-label">6 oy</div>
+          <div style="font-size: 12px; color: var(--gold); margin-top: 4px;">225,000 so'm</div>
+        </div>
+        <div class="content-card">
+          <div class="content-icon">💎</div>
+          <div class="content-label">12 oy</div>
+          <div style="font-size: 12px; color: var(--gold); margin-top: 4px;">370,000 so'm</div>
+        </div>
+      </div>
     </div>
     
     <!-- ═══ GIFTS VIEW ═══ -->
     <div id="view-gifts" class="view">
-      <h2>Sovg'a yuborish</h2>
-      <p>Gifts page content</p>
-      <button onclick="showView('home')">← Orqaga</button>
+      <div class="sub-header">
+        <button class="back-btn" onclick="navigateTo('home')">←</button>
+        <div>
+          <div class="sub-title">Sovg'a yuborish</div>
+          <div class="sub-subtitle">Do'stlaringizga gift yuboring</div>
+        </div>
+      </div>
+      
+      <div class="content-grid">
+        <div class="content-card">
+          <div class="content-icon">💝</div>
+          <div class="content-label">13 Stars</div>
+          <div style="font-size: 12px; color: var(--gold); margin-top: 4px;">3,185 so'm</div>
+        </div>
+        <div class="content-card">
+          <div class="content-icon">🎁</div>
+          <div class="content-label">21 Stars</div>
+          <div style="font-size: 12px; color: var(--gold); margin-top: 4px;">5,145 so'm</div>
+        </div>
+        <div class="content-card">
+          <div class="content-icon">🎂</div>
+          <div class="content-label">43 Stars</div>
+          <div style="font-size: 12px; color: var(--gold); margin-top: 4px;">10,535 so'm</div>
+        </div>
+        <div class="content-card">
+          <div class="content-icon">💎</div>
+          <div class="content-label">85 Stars</div>
+          <div style="font-size: 12px; color: var(--gold); margin-top: 4px;">20,825 so'm</div>
+        </div>
+      </div>
     </div>
     
     <!-- ═══ REFERRAL VIEW ═══ -->
     <div id="view-referral" class="view">
-      <h2>Referral dasturi</h2>
-      <p>Referral page content</p>
-      <button onclick="showView('home')">← Orqaga</button>
+      <div class="sub-header">
+        <button class="back-btn" onclick="navigateTo('home')">←</button>
+        <div>
+          <div class="sub-title">Referral dasturi</div>
+          <div class="sub-subtitle">Do'stlarni taklif qiling</div>
+        </div>
+      </div>
+      
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; text-align: center; margin-bottom: 16px;">
+        <div style="font-size: 36px; font-weight: 900; color: var(--gold); margin-bottom: 6px;">+50 so'm</div>
+        <div style="font-size: 14px; color: var(--text-muted);">Har bir yangi foydalanuvchi uchun</div>
+      </div>
+      
+      <div class="content-grid">
+        <div class="content-card">
+          <div class="content-icon">👥</div>
+          <div class="content-label">0</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Takliflar</div>
+        </div>
+        <div class="content-card">
+          <div class="content-icon">💰</div>
+          <div class="content-label">0 so'm</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Daromad</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ═══ ORDERS VIEW ═══ -->
+    <div id="view-orders" class="view">
+      <div class="sub-header">
+        <button class="back-btn" onclick="navigateTo('home')">←</button>
+        <div>
+          <div class="sub-title">Buyu rtmalar</div>
+          <div class="sub-subtitle">Sizning buyurtmalaringiz</div>
+        </div>
+      </div>
+      
+      <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+        <div style="font-size: 40px; margin-bottom: 12px;">📦</div>
+        <div>Buyurtmalar yo'q</div>
+      </div>
+    </div>
+    
+    <!-- ═══ LEADERBOARD VIEW ═══ -->
+    <div id="view-leaderboard" class="view">
+      <div class="sub-header">
+        <button class="back-btn" onclick="navigateTo('home')">←</button>
+        <div>
+          <div class="sub-title">Reyting</div>
+          <div class="sub-subtitle">Eng yaxshi xaridorlar</div>
+        </div>
+      </div>
+      
+      <div class="filter-tabs">
+        <button class="filter-tab active" onclick="filterLeaderboard('today')">Bugun</button>
+        <button class="filter-tab" onclick="filterLeaderboard('week')">Hafta</button>
+        <button class="filter-tab" onclick="filterLeaderboard('month')">Oy</button>
+      </div>
+      
+      <div id="leaderboard-list">
+        <div class="leaderboard-item">
+          <div class="rank-badge rank-1">🥇</div>
+          <div class="leaderboard-info">
+            <div class="leaderboard-name">@user1</div>
+            <div class="leaderboard-amount">5 buyurtma</div>
+          </div>
+          <div class="leaderboard-value">500,000 so'm</div>
+        </div>
+        
+        <div class="leaderboard-item">
+          <div class="rank-badge rank-2">🥈</div>
+          <div class="leaderboard-info">
+            <div class="leaderboard-name">@user2</div>
+            <div class="leaderboard-amount">3 buyurtma</div>
+          </div>
+          <div class="leaderboard-value">300,000 so'm</div>
+        </div>
+        
+        <div class="leaderboard-item">
+          <div class="rank-badge rank-3">🥉</div>
+          <div class="leaderboard-info">
+            <div class="leaderboard-name">@user3</div>
+            <div class="leaderboard-amount">2 buyurtma</div>
+          </div>
+          <div class="leaderboard-value">200,000 so'm</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ═══ SETTINGS VIEW ═══ -->
+    <div id="view-settings" class="view">
+      <div class="sub-header">
+        <button class="back-btn" onclick="navigateTo('home')">←</button>
+        <div>
+          <div class="sub-title">Sozlamalar</div>
+          <div class="sub-subtitle">Ilovani sozlash</div>
+        </div>
+      </div>
+      
+      <div class="settings-item">
+        <div>
+          <div class="settings-label">Til</div>
+          <div class="settings-value">Tilni tanlang</div>
+        </div>
+        <select class="language-select" onchange="changeLanguage(this.value)">
+          <option value="uz">🇺🇿 O'zbek</option>
+          <option value="ru">🇷🇺 Русский</option>
+          <option value="en">🇬🇧 English</option>
+        </select>
+      </div>
+      
+      <div class="settings-item">
+        <div>
+          <div class="settings-label">Versiya</div>
+          <div class="settings-value">1.0.0</div>
+        </div>
+      </div>
+      
+      <div class="settings-item">
+        <div>
+          <div class="settings-label">Haqida</div>
+          <div class="settings-value">StarPayUz - Telegram xizmatlari</div>
+        </div>
+      </div>
     </div>
   </div>
   
@@ -297,11 +688,6 @@
       tg.expand();
     }
     
-    function showView(name) {
-      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-      document.getElementById(`view-${name}`).classList.add('active');
-    }
-    
     function navigateTo(page) {
       // Update active nav item
       document.querySelectorAll('.nav-item').forEach(item => {
@@ -312,31 +698,26 @@
         activeItem.classList.add('active');
       }
       
-      if (page === 'home') {
-        showView('home');
-        return;
+      // Show view
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      const view = document.getElementById(`view-${page}`);
+      if (view) {
+        view.classList.add('active');
       }
-      
-      // Load page from separate HTML file
-      fetch(`/pages/${page}.html`)
-        .then(r => r.text())
-        .then(html => {
-          const app = document.querySelector('.app');
-          app.innerHTML = html;
-          // Add back button
-          const backBtn = document.createElement('button');
-          backBtn.textContent = '← Home';
-          backBtn.onclick = () => navigateTo('home');
-          app.insertBefore(backBtn, app.firstChild);
-        })
-        .catch(err => {
-          console.error('Error loading page:', err);
-          showView('home');
-        });
     }
     
     function openTopupModal() {
-      alert('Topup modal');
+      alert('Topup modal - скоро будет');
+    }
+    
+    function filterLeaderboard(period) {
+      document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
+      event.target.classList.add('active');
+      console.log('Filter by:', period);
+    }
+    
+    function changeLanguage(lang) {
+      console.log('Language changed to:', lang);
     }
     
     // Update balance
