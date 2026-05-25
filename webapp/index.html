@@ -9,12 +9,13 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
     :root {
-      --bg: #0a0810;
-      --card: #18121f;
-      --text: #f5f0e8;
-      --text-muted: #9a8fa8;
-      --gold: #e4b84a;
-      --border: rgba(212, 175, 90, 0.1);
+      --bg: #1a2332;
+      --card: #243447;
+      --text: #e8eef7;
+      --text-muted: #8b95a8;
+      --accent: #4a9eff;
+      --accent-light: #6bb3ff;
+      --border: rgba(74, 158, 255, 0.1);
     }
     
     body {
@@ -47,25 +48,21 @@
     }
     
     .brand-logo {
-      height: 55px;
+      height: 40px;
       width: auto;
-      max-width: 220px;
+      max-width: 180px;
       object-fit: contain;
     }
     
     .balance-widget {
       display: flex;
       align-items: center;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 4px 4px 4px 14px;
-      gap: 6px;
+      gap: 8px;
     }
     
     .balance-amount {
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 600;
       white-space: nowrap;
     }
     
@@ -74,51 +71,57 @@
       height: 32px;
       border: none;
       border-radius: 50%;
-      background: linear-gradient(145deg, #c17f3a, #8b5a2b);
+      background: var(--accent);
       color: #fff;
-      font-size: 18px;
+      font-size: 16px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: all 0.2s;
+    }
+    
+    .balance-btn:active {
+      transform: scale(0.95);
+      background: var(--accent-light);
     }
     
     .action-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
     
     .action-card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px 14px 16px;
+      border-radius: 12px;
+      padding: 16px 12px;
       text-align: center;
       cursor: pointer;
       transition: all 0.2s;
     }
     
     .action-card:active {
-      transform: scale(0.97);
-      background: rgba(212, 175, 90, 0.1);
+      transform: scale(0.98);
+      background: rgba(74, 158, 255, 0.1);
     }
     
     .action-icon {
       font-size: 40px;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
     
     .action-icon img {
-      width: 50px;
-      height: 50px;
+      width: 45px;
+      height: 45px;
       object-fit: contain;
     }
     
     .action-label {
-      font-size: 14px;
-      font-weight: 700;
+      font-size: 13px;
+      font-weight: 600;
     }
     
     .list-card {
@@ -127,42 +130,48 @@
       gap: 12px;
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 14px;
-      margin-bottom: 10px;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 8px;
       cursor: pointer;
       transition: all 0.2s;
     }
     
     .list-card:active {
       transform: scale(0.98);
-      background: rgba(212, 175, 90, 0.1);
+      background: rgba(74, 158, 255, 0.1);
     }
     
     .list-icon {
-      width: 44px;
-      height: 44px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
+      font-size: 18px;
       flex-shrink: 0;
+      background: rgba(74, 158, 255, 0.15);
     }
     
     .list-body { flex: 1; }
-    .list-title { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
-    .list-sub { font-size: 12px; color: var(--text-muted); }
+    .list-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+    .list-sub { font-size: 11px; color: var(--text-muted); }
     
     .pill-btn {
-      padding: 8px 14px;
+      padding: 6px 12px;
       border: none;
-      border-radius: 999px;
-      background: linear-gradient(145deg, #c17f3a, #8b5a2b);
+      border-radius: 6px;
+      background: var(--accent);
       color: #fff;
-      font-size: 12px;
-      font-weight: 700;
+      font-size: 11px;
+      font-weight: 600;
       cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .pill-btn:active {
+      background: var(--accent-light);
     }
     
     .footer-nav {
@@ -186,18 +195,18 @@
       gap: 4px;
       flex: 1;
       color: var(--text-muted);
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       cursor: pointer;
       transition: color 0.2s;
     }
     
     .nav-item.active {
-      color: var(--gold);
+      color: var(--accent);
     }
     
     .nav-icon {
-      font-size: 20px;
+      font-size: 18px;
     }
     
     .view { display: none; }
@@ -207,145 +216,116 @@
       text-align: center;
       font-size: 11px;
       color: var(--text-muted);
-      margin-top: 24px;
-      opacity: 0.7;
+      margin-top: 20px;
+      opacity: 0.6;
     }
     
     .sub-header {
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
     
     .back-btn {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 8px;
       background: var(--card);
       color: var(--text);
-      font-size: 20px;
+      font-size: 18px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-    
-    .sub-title {
-      font-size: 18px;
-      font-weight: 800;
-    }
-    
-    .sub-subtitle {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
-    
-    .content-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-    
-    .content-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 16px;
-      text-align: center;
-      cursor: pointer;
       transition: all 0.2s;
     }
     
-    .content-card:active {
-      transform: scale(0.97);
-      background: rgba(212, 175, 90, 0.1);
+    .back-btn:active {
+      background: rgba(74, 158, 255, 0.1);
     }
     
-    .content-icon {
-      font-size: 40px;
-      margin-bottom: 12px;
-    }
-    
-    .content-label {
-      font-size: 13px;
+    .sub-title {
+      font-size: 16px;
       font-weight: 700;
     }
     
-    .leaderboard-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px;
-      margin-bottom: 8px;
-    }
-    
-    .rank-badge {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 18px;
-      flex-shrink: 0;
-    }
-    
-    .rank-1 { background: linear-gradient(145deg, #ffd700, #ffed4e); color: #000; }
-    .rank-2 { background: linear-gradient(145deg, #c0c0c0, #e8e8e8); color: #000; }
-    .rank-3 { background: linear-gradient(145deg, #cd7f32, #e8a76a); color: #fff; }
-    
-    .leaderboard-info {
-      flex: 1;
-    }
-    
-    .leaderboard-name {
-      font-size: 14px;
-      font-weight: 700;
-      margin-bottom: 2px;
-    }
-    
-    .leaderboard-amount {
-      font-size: 12px;
+    .sub-subtitle {
+      font-size: 11px;
       color: var(--text-muted);
-    }
-    
-    .leaderboard-value {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--gold);
+      margin-top: 2px;
     }
     
     .filter-tabs {
       display: flex;
       gap: 8px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
     
     .filter-tab {
       flex: 1;
       padding: 8px 12px;
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 6px;
       background: transparent;
       color: var(--text-muted);
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
     }
     
     .filter-tab.active {
-      background: var(--gold);
-      color: #000;
-      border-color: var(--gold);
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 6px;
+    }
+    
+    .rank-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+      background: rgba(74, 158, 255, 0.15);
+      color: var(--accent);
+    }
+    
+    .leaderboard-info {
+      flex: 1;
+    }
+    
+    .leaderboard-name {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    
+    .leaderboard-amount {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    
+    .leaderboard-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
     }
     
     .settings-item {
@@ -354,29 +334,52 @@
       justify-content: space-between;
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 10px;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 8px;
     }
     
     .settings-label {
-      font-size: 14px;
-      font-weight: 700;
+      font-size: 13px;
+      font-weight: 600;
     }
     
     .settings-value {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--text-muted);
     }
     
     .language-select {
-      padding: 8px 12px;
+      padding: 6px 10px;
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 6px;
       background: var(--card);
       color: var(--text);
-      font-size: 12px;
+      font-size: 11px;
       cursor: pointer;
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: rgba(74, 158, 255, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      transition: width 0.3s;
+    }
+    
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--text-muted);
     }
   </style>
 </head>
@@ -390,7 +393,7 @@
         </div>
         <div class="balance-widget">
           <span class="balance-amount" id="headerBalance">0 so'm</span>
-          <button class="balance-btn" onclick="openTopupModal()">+</button>
+          <button class="balance-btn" onclick="openTopupModal()" title="Pul qo'shish">+</button>
         </div>
       </div>
       
@@ -412,22 +415,41 @@
       <div class="list-card" onclick="navigateTo('gifts')">
         <div class="list-icon">🎁</div>
         <div class="list-body">
-          <div class="list-title">Sovg'a yuborish</div>
-          <div class="list-sub">Do'stlaringizga gift yuboring</div>
+          <div class="list-title">Maxsus chegirmalar</div>
+          <div class="list-sub">Chegirmangan loyihalar mavjud</div>
         </div>
         <button class="pill-btn" onclick="event.stopPropagation()">Tanlash</button>
       </div>
       
       <div class="list-card" onclick="navigateTo('referral')">
-        <div class="list-icon">↗</div>
+        <div class="list-icon">🔗</div>
         <div class="list-body">
           <div class="list-title">Referral orqali daromad</div>
-          <div class="list-sub">Har bir do'st uchun 50 so'm</div>
+          <div class="list-sub">Savodosdan doimiy ulush</div>
         </div>
         <button class="pill-btn" onclick="event.stopPropagation()">Ulashish</button>
       </div>
       
-      <p class="footer-note">© StarPayUz · Telegram Stars & Premium</p>
+      <div class="list-card" onclick="navigateTo('stats')">
+        <div class="list-icon">📊</div>
+        <div class="list-body">
+          <div class="list-title">Savdo statistikasi</div>
+          <div class="list-sub">Kunlik, haftalik va oylik hisoblar</div>
+        </div>
+      </div>
+      
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-top: 12px;">
+        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px;">Umumiy savdo maqsadi</div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 35%;"></div>
+        </div>
+        <div class="progress-labels">
+          <span>0 so'm</span>
+          <span>1 200 000 so'm</span>
+        </div>
+      </div>
+      
+      <p class="footer-note">© StarPayUz · Telegram xizmatlari</p>
     </div>
     
     <!-- ═══ STARS VIEW ═══ -->
@@ -440,27 +462,40 @@
         </div>
       </div>
       
-      <div class="content-grid">
-        <div class="content-card">
-          <div class="content-icon">⭐</div>
-          <div class="content-label">50 Stars</div>
-          <div style="font-size: 12px; color: var(--gold); margin-top: 4px;">9,750 so'm</div>
+      <div class="list-card">
+        <div class="list-icon">⭐</div>
+        <div class="list-body">
+          <div class="list-title">50 Stars</div>
+          <div class="list-sub">Eng arzon paket</div>
         </div>
-        <div class="content-card">
-          <div class="content-icon">⭐</div>
-          <div class="content-label">100 Stars</div>
-          <div style="font-size: 12px; color: var(--gold); margin-top: 4px;">19,500 so'm</div>
+        <div style="font-weight: 600; color: var(--accent);">9,750 so'm</div>
+      </div>
+      
+      <div class="list-card">
+        <div class="list-icon">⭐</div>
+        <div class="list-body">
+          <div class="list-title">100 Stars</div>
+          <div class="list-sub">Mashhur paket</div>
         </div>
-        <div class="content-card">
-          <div class="content-icon">⭐</div>
-          <div class="content-label">500 Stars</div>
-          <div style="font-size: 12px; color: var(--gold); margin-top: 4px;">97,500 so'm</div>
+        <div style="font-weight: 600; color: var(--accent);">19,500 so'm</div>
+      </div>
+      
+      <div class="list-card">
+        <div class="list-icon">⭐</div>
+        <div class="list-body">
+          <div class="list-title">500 Stars</div>
+          <div class="list-sub">Katta paket</div>
         </div>
-        <div class="content-card">
-          <div class="content-icon">⭐</div>
-          <div class="content-label">1000 Stars</div>
-          <div style="font-size: 12px; color: var(--gold); margin-top: 4px;">195,000 so'm</div>
+        <div style="font-weight: 600; color: var(--accent);">97,500 so'm</div>
+      </div>
+      
+      <div class="list-card">
+        <div class="list-icon">⭐</div>
+        <div class="list-body">
+          <div class="list-title">1000 Stars</div>
+          <div class="list-sub">Eng katta paket</div>
         </div>
+        <div style="font-weight: 600; color: var(--accent);">195,000 so'm</div>
       </div>
     </div>
     
@@ -474,27 +509,40 @@
         </div>
       </div>
       
-      <div class="content-grid">
-        <div class="content-card">
-          <div class="content-icon">💎</div>
-          <div class="content-label">1 oy</div>
-          <div style="font-size: 12px; color: var(--gold); margin-top: 4px;">45,000 so'm</div>
+      <div class="list-card">
+        <div class="list-icon">💎</div>
+        <div class="list-body">
+          <div class="list-title">1 oy Premium</div>
+          <div class="list-sub">Bir oylik obuna</div>
         </div>
-        <div class="content-card">
-          <div class="content-icon">💎</div>
-          <div class="content-label">3 oy</div>
-          <div style="font-size: 12px; color: var(--gold); margin-top: 4px;">160,000 so'm</div>
+        <div style="font-weight: 600; color: var(--accent);">45,000 so'm</div>
+      </div>
+      
+      <div class="list-card">
+        <div class="list-icon">💎</div>
+        <div class="list-body">
+          <div class="list-title">3 oy Premium</div>
+          <div class="list-sub">Uchta oylik obuna</div>
         </div>
-        <div class="content-card">
-          <div class="content-icon">💎</div>
-          <div class="content-label">6 oy</div>
-          <div style="font-size: 12px; color: var(--gold); margin-top: 4px;">225,000 so'm</div>
+        <div style="font-weight: 600; color: var(--accent);">160,000 so'm</div>
+      </div>
+      
+      <div class="list-card">
+        <div class="list-icon">💎</div>
+        <div class="list-body">
+          <div class="list-title">6 oy Premium</div>
+          <div class="list-sub">Oltita oylik obuna</div>
         </div>
-        <div class="content-card">
-          <div class="content-icon">💎</div>
-          <div class="content-label">12 oy</div>
-          <div style="font-size: 12px; color: var(--gold); margin-top: 4px;">370,000 so'm</div>
+        <div style="font-weight: 600; color: var(--accent);">225,000 so'm</div>
+      </div>
+      
+      <div class="list-card">
+        <div class="list-icon">💎</div>
+        <div class="list-body">
+          <div class="list-title">12 oy Premium</div>
+          <div class="list-sub">Yillik obuna</div>
         </div>
+        <div style="font-weight: 600; color: var(--accent);">370,000 so'm</div>
       </div>
     </div>
     
@@ -503,32 +551,45 @@
       <div class="sub-header">
         <button class="back-btn" onclick="navigateTo('home')">←</button>
         <div>
-          <div class="sub-title">Sovg'a yuborish</div>
-          <div class="sub-subtitle">Do'stlaringizga gift yuboring</div>
+          <div class="sub-title">Maxsus chegirmalar</div>
+          <div class="sub-subtitle">Chegirmangan loyihalar</div>
         </div>
       </div>
       
-      <div class="content-grid">
-        <div class="content-card">
-          <div class="content-icon">💝</div>
-          <div class="content-label">13 Stars</div>
-          <div style="font-size: 12px; color: var(--gold); margin-top: 4px;">3,185 so'm</div>
+      <div class="list-card">
+        <div class="list-icon">💝</div>
+        <div class="list-body">
+          <div class="list-title">13 Stars Sovg'a</div>
+          <div class="list-sub">Kichik sovg'a paket</div>
         </div>
-        <div class="content-card">
-          <div class="content-icon">🎁</div>
-          <div class="content-label">21 Stars</div>
-          <div style="font-size: 12px; color: var(--gold); margin-top: 4px;">5,145 so'm</div>
+        <div style="font-weight: 600; color: var(--accent);">3,185 so'm</div>
+      </div>
+      
+      <div class="list-card">
+        <div class="list-icon">🎁</div>
+        <div class="list-body">
+          <div class="list-title">21 Stars Sovg'a</div>
+          <div class="list-sub">O'rta sovg'a paket</div>
         </div>
-        <div class="content-card">
-          <div class="content-icon">🎂</div>
-          <div class="content-label">43 Stars</div>
-          <div style="font-size: 12px; color: var(--gold); margin-top: 4px;">10,535 so'm</div>
+        <div style="font-weight: 600; color: var(--accent);">5,145 so'm</div>
+      </div>
+      
+      <div class="list-card">
+        <div class="list-icon">🎂</div>
+        <div class="list-body">
+          <div class="list-title">43 Stars Sovg'a</div>
+          <div class="list-sub">Katta sovg'a paket</div>
         </div>
-        <div class="content-card">
-          <div class="content-icon">💎</div>
-          <div class="content-label">85 Stars</div>
-          <div style="font-size: 12px; color: var(--gold); margin-top: 4px;">20,825 so'm</div>
+        <div style="font-weight: 600; color: var(--accent);">10,535 so'm</div>
+      </div>
+      
+      <div class="list-card">
+        <div class="list-icon">💎</div>
+        <div class="list-body">
+          <div class="list-title">85 Stars Sovg'a</div>
+          <div class="list-sub">Eng katta sovg'a paket</div>
         </div>
+        <div style="font-weight: 600; color: var(--accent);">20,825 so'm</div>
       </div>
     </div>
     
@@ -542,38 +603,77 @@
         </div>
       </div>
       
-      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; text-align: center; margin-bottom: 16px;">
-        <div style="font-size: 36px; font-weight: 900; color: var(--gold); margin-bottom: 6px;">+50 so'm</div>
-        <div style="font-size: 14px; color: var(--text-muted);">Har bir yangi foydalanuvchi uchun</div>
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 12px; text-align: center;">
+        <div style="font-size: 28px; font-weight: 700; color: var(--accent); margin-bottom: 4px;">+50 so'm</div>
+        <div style="font-size: 11px; color: var(--text-muted);">Har bir yangi foydalanuvchi uchun</div>
       </div>
       
-      <div class="content-grid">
-        <div class="content-card">
-          <div class="content-icon">👥</div>
-          <div class="content-label">0</div>
-          <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Takliflar</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+        <div class="list-card" style="margin-bottom: 0;">
+          <div class="list-icon">👥</div>
+          <div class="list-body">
+            <div class="list-title">0</div>
+            <div class="list-sub">Takliflar</div>
+          </div>
         </div>
-        <div class="content-card">
-          <div class="content-icon">💰</div>
-          <div class="content-label">0 so'm</div>
-          <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Daromad</div>
+        <div class="list-card" style="margin-bottom: 0;">
+          <div class="list-icon">💰</div>
+          <div class="list-body">
+            <div class="list-title">0 so'm</div>
+            <div class="list-sub">Daromad</div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px;">
+        <div style="font-size: 12px; font-weight: 600; margin-bottom: 8px;">Referral havolangiz:</div>
+        <div style="background: rgba(74, 158, 255, 0.1); border: 1px solid var(--border); border-radius: 8px; padding: 8px; font-size: 11px; word-break: break-all; color: var(--accent);">
+          https://t.me/starpayuzbot?start=ref_123456
         </div>
       </div>
     </div>
     
-    <!-- ═══ ORDERS VIEW ═══ -->
-    <div id="view-orders" class="view">
+    <!-- ═══ STATS VIEW ═══ -->
+    <div id="view-stats" class="view">
       <div class="sub-header">
         <button class="back-btn" onclick="navigateTo('home')">←</button>
         <div>
-          <div class="sub-title">Buyu rtmalar</div>
-          <div class="sub-subtitle">Sizning buyurtmalaringiz</div>
+          <div class="sub-title">Savdo statistikasi</div>
+          <div class="sub-subtitle">Kunlik, haftalik va oylik hisoblar</div>
         </div>
       </div>
       
-      <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
-        <div style="font-size: 40px; margin-bottom: 12px;">📦</div>
-        <div>Buyurtmalar yo'q</div>
+      <div class="filter-tabs">
+        <button class="filter-tab active" onclick="filterStats('today')">Bugun</button>
+        <button class="filter-tab" onclick="filterStats('week')">Bu hafta</button>
+        <button class="filter-tab" onclick="filterStats('month')">Bu oy</button>
+      </div>
+      
+      <div class="list-card">
+        <div class="list-icon">📊</div>
+        <div class="list-body">
+          <div class="list-title">Jami savdo</div>
+          <div class="list-sub">Barcha buyurtmalar</div>
+        </div>
+        <div style="font-weight: 600; color: var(--accent);">0 so'm</div>
+      </div>
+      
+      <div class="list-card">
+        <div class="list-icon">📈</div>
+        <div class="list-body">
+          <div class="list-title">Buyurtmalar soni</div>
+          <div class="list-sub">Jami buyurtmalar</div>
+        </div>
+        <div style="font-weight: 600; color: var(--accent);">0</div>
+      </div>
+      
+      <div class="list-card">
+        <div class="list-icon">💵</div>
+        <div class="list-body">
+          <div class="list-title">O'rtacha buyurtma</div>
+          <div class="list-sub">Bir buyurtmaga</div>
+        </div>
+        <div style="font-weight: 600; color: var(--accent);">0 so'm</div>
       </div>
     </div>
     
@@ -589,37 +689,69 @@
       
       <div class="filter-tabs">
         <button class="filter-tab active" onclick="filterLeaderboard('today')">Bugun</button>
-        <button class="filter-tab" onclick="filterLeaderboard('week')">Hafta</button>
-        <button class="filter-tab" onclick="filterLeaderboard('month')">Oy</button>
+        <button class="filter-tab" onclick="filterLeaderboard('week')">Bu hafta</button>
+        <button class="filter-tab" onclick="filterLeaderboard('month')">Bu oy</button>
       </div>
       
-      <div id="leaderboard-list">
-        <div class="leaderboard-item">
-          <div class="rank-badge rank-1">🥇</div>
-          <div class="leaderboard-info">
-            <div class="leaderboard-name">@user1</div>
-            <div class="leaderboard-amount">5 buyurtma</div>
-          </div>
-          <div class="leaderboard-value">500,000 so'm</div>
+      <div class="leaderboard-item">
+        <div class="rank-badge">🥇</div>
+        <div class="leaderboard-info">
+          <div class="leaderboard-name">Rahmonov</div>
+          <div class="leaderboard-amount">5 buyurtma</div>
         </div>
-        
-        <div class="leaderboard-item">
-          <div class="rank-badge rank-2">🥈</div>
-          <div class="leaderboard-info">
-            <div class="leaderboard-name">@user2</div>
-            <div class="leaderboard-amount">3 buyurtma</div>
-          </div>
-          <div class="leaderboard-value">300,000 so'm</div>
+        <div class="leaderboard-value">500,000 so'm</div>
+      </div>
+      
+      <div class="leaderboard-item">
+        <div class="rank-badge">🥈</div>
+        <div class="leaderboard-info">
+          <div class="leaderboard-name">Xomroyitdek</div>
+          <div class="leaderboard-amount">4 buyurtma</div>
         </div>
-        
-        <div class="leaderboard-item">
-          <div class="rank-badge rank-3">🥉</div>
-          <div class="leaderboard-info">
-            <div class="leaderboard-name">@user3</div>
-            <div class="leaderboard-amount">2 buyurtma</div>
-          </div>
-          <div class="leaderboard-value">200,000 so'm</div>
+        <div class="leaderboard-value">387,791 so'm</div>
+      </div>
+      
+      <div class="leaderboard-item">
+        <div class="rank-badge">🥉</div>
+        <div class="leaderboard-info">
+          <div class="leaderboard-name">lirom_be</div>
+          <div class="leaderboard-amount">3 buyurtma</div>
         </div>
+        <div class="leaderboard-value">245,404 so'm</div>
+      </div>
+      
+      <div class="leaderboard-item">
+        <div class="rank-badge">4.</div>
+        <div class="leaderboard-info">
+          <div class="leaderboard-name">X</div>
+          <div class="leaderboard-amount">2 buyurtma</div>
+        </div>
+        <div class="leaderboard-value">242,081 so'm</div>
+      </div>
+      
+      <div class="leaderboard-item">
+        <div class="rank-badge">5.</div>
+        <div class="leaderboard-info">
+          <div class="leaderboard-name">A.Z.Y</div>
+          <div class="leaderboard-amount">2 buyurtma</div>
+        </div>
+        <div class="leaderboard-value">220,309 so'm</div>
+      </div>
+    </div>
+    
+    <!-- ═══ ORDERS VIEW ═══ -->
+    <div id="view-orders" class="view">
+      <div class="sub-header">
+        <button class="back-btn" onclick="navigateTo('home')">←</button>
+        <div>
+          <div class="sub-title">Buyurtmalar</div>
+          <div class="sub-subtitle">Sizning buyurtmalaringiz</div>
+        </div>
+      </div>
+      
+      <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+        <div style="font-size: 36px; margin-bottom: 12px;">📦</div>
+        <div style="font-size: 13px;">Buyurtmalar yo'q</div>
       </div>
     </div>
     
@@ -665,19 +797,23 @@
   <div class="footer-nav">
     <div class="nav-item active" data-page="home" onclick="navigateTo('home')">
       <div class="nav-icon">🏠</div>
-      <div>Home</div>
+      <div>Stars</div>
     </div>
     <div class="nav-item" data-page="orders" onclick="navigateTo('orders')">
       <div class="nav-icon">📦</div>
-      <div>Orders</div>
+      <div>Giftlar</div>
     </div>
     <div class="nav-item" data-page="leaderboard" onclick="navigateTo('leaderboard')">
       <div class="nav-icon">🏆</div>
-      <div>Leaderboard</div>
+      <div>Giveaway</div>
+    </div>
+    <div class="nav-item" data-page="stats" onclick="navigateTo('stats')">
+      <div class="nav-icon">⏱️</div>
+      <div>Tarix</div>
     </div>
     <div class="nav-item" data-page="settings" onclick="navigateTo('settings')">
-      <div class="nav-icon">⚙️</div>
-      <div>Settings</div>
+      <div class="nav-icon">👤</div>
+      <div>Men</div>
     </div>
   </div>
   
@@ -689,7 +825,6 @@
     }
     
     function navigateTo(page) {
-      // Update active nav item
       document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.remove('active');
       });
@@ -698,7 +833,6 @@
         activeItem.classList.add('active');
       }
       
-      // Show view
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       const view = document.getElementById(`view-${page}`);
       if (view) {
@@ -707,20 +841,23 @@
     }
     
     function openTopupModal() {
-      alert('Topup modal - скоро будет');
+      alert('Pul qo\'shish - tez kunda');
     }
     
     function filterLeaderboard(period) {
       document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
       event.target.classList.add('active');
-      console.log('Filter by:', period);
+    }
+    
+    function filterStats(period) {
+      document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
+      event.target.classList.add('active');
     }
     
     function changeLanguage(lang) {
-      console.log('Language changed to:', lang);
+      console.log('Til o\'zgartirildi:', lang);
     }
     
-    // Update balance
     function updateBalance() {
       document.getElementById('headerBalance').textContent = '0 so\'m';
     }
