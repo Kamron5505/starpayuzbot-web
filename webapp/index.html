@@ -515,9 +515,11 @@
       border: 2px solid var(--border-light);
       border-radius: 20px;
       padding: 24px;
-      max-width: 320px;
-      width: 90%;
+      max-width: 360px;
+      width: 95%;
       animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
     @keyframes slideUp {
@@ -603,24 +605,27 @@
       display: flex;
       gap: 8px;
       margin-bottom: 16px;
+      width: 100%;
     }
 
     .custom-amount input {
       flex: 1;
-      padding: 10px 12px;
+      padding: 14px 16px;
       border: 1.5px solid var(--border);
-      border-radius: 10px;
+      border-radius: 12px;
       background: rgba(0, 0, 0, 0.3);
       color: var(--text);
-      font-size: 12px;
+      font-size: 16px;
       font-weight: 600;
       transition: all 0.3s;
+      width: 100%;
     }
 
     .custom-amount input:focus {
       outline: none;
       border-color: var(--gold);
       background: rgba(0, 0, 0, 0.5);
+      box-shadow: 0 0 12px rgba(255, 165, 0, 0.2);
     }
 
     .custom-amount input::placeholder {
@@ -677,7 +682,7 @@
         </div>
         <div class="balance-widget">
           <span class="balance-amount" id="headerBalance">0 so'm</span>
-          <button class="balance-btn" onclick="openTopupModal()" title="Pul qo'shish">+</button>
+          <button class="balance-btn" onclick="alert('Балансни пополнить можно через бота. /topup командасини ёзинг')" title="Pul qo'shish">+</button>
         </div>
       </div>
       
@@ -1046,32 +1051,7 @@
   </div>
   
   <!-- ═══ TOPUP MODAL ═══ -->
-  <div id="topupModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-title">Pul qo'shish</div>
-        <button class="modal-close" onclick="closeTopupModal()">✕</button>
-      </div>
-
-      <div class="topup-amounts">
-        <button class="amount-btn" onclick="selectAmount(10000)">10,000 so'm</button>
-        <button class="amount-btn" onclick="selectAmount(25000)">25,000 so'm</button>
-        <button class="amount-btn" onclick="selectAmount(50000)">50,000 so'm</button>
-        <button class="amount-btn" onclick="selectAmount(100000)">100,000 so'm</button>
-      </div>
-
-      <div class="custom-amount">
-        <input type="number" id="customAmount" placeholder="Boshqa summa" min="1000" max="10000000">
-      </div>
-
-      <button class="topup-submit" id="topupBtn" onclick="processTopup()">Pul qo'shish</button>
-
-      <div class="topup-info">
-        💳 Humo karta orqali to'lov<br>
-        Xavfsiz va tez
-      </div>
-    </div>
-  </div>
+  <!-- Removed - use /topup command in bot instead -->
 
   <script>
     const tg = window.Telegram?.WebApp;
