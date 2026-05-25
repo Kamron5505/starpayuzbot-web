@@ -211,24 +211,14 @@ function showAlert(message, type = 'info') {
 
 // Footer navigation
 function setupFooterNavigation() {
-  const currentPage = getCurrentPage();
-  
+  // Set home as active by default
   document.querySelectorAll('.nav-item').forEach(item => {
     item.classList.remove('active');
   });
-
-  const activeItem = document.querySelector(`[data-page="${currentPage}"]`);
-  if (activeItem) {
-    activeItem.classList.add('active');
+  const homeItem = document.querySelector('[data-page="home"]');
+  if (homeItem) {
+    homeItem.classList.add('active');
   }
-}
-
-function getCurrentPage() {
-  const path = window.location.pathname;
-  if (path.includes('leaderboard')) return 'leaderboard';
-  if (path.includes('settings')) return 'settings';
-  if (path.includes('orders')) return 'orders';
-  return 'home';
 }
 
 function navigateTo(page, event) {
@@ -236,15 +226,42 @@ function navigateTo(page, event) {
     event.preventDefault();
   }
 
-  const routes = {
-    home: '/',
-    orders: '/orders',
-    leaderboard: '/leaderboard',
-    settings: '/settings',
-  };
+  // Update active nav item
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.remove('active');
+  });
+  const activeItem = document.querySelector(`[data-page="${page}"]`);
+  if (activeItem) {
+    activeItem.classList.add('active');
+  }
 
-  const url = routes[page] || '/';
-  window.location.href = url;
+  // Load page content
+  const pageContainer = document.getElementById('page-container');
+  
+  if (page === 'home') {
+    pageContainer.innerHTML = '';
+    return;
+  }
+
+  // Load page HTML
+  const pageFile = `/pages/${page}.html`;
+  
+  fetch(pageFile)
+    .then(response => {
+      if (!response.ok) throw new Error('Page not found');
+      return response.text();
+    })
+    .then(html => {
+      pageContainer.innerHTML = html;
+      // Re-initialize i18n for new content
+      if (window.i18n) {
+        i18n.updatePageLanguage();
+      }
+    })
+    .catch(error => {
+      console.error('Error loading page:', error);
+      pageContainer.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--danger);">Страница не найдена</div>`;
+    });
 }
 
 // Initialize on page load
