@@ -21,7 +21,7 @@ app.get('/', (req, res) => {
   }
 });
 
-// Serve pages
+// Serve pages - handle both with and without .html extension
 app.get('/pages/:page', (req, res) => {
   const pagePath = path.join(__dirname, '../webapp', 'pages', req.params.page + '.html');
   if (fs.existsSync(pagePath)) {
@@ -40,6 +40,11 @@ app.get('/:file.html', (req, res) => {
     res.status(404).json({ error: 'File not found' });
   }
 });
+
+// Serve assets
+app.use('/assets', express.static(path.join(__dirname, '../webapp', 'assets')));
+app.use('/css', express.static(path.join(__dirname, '../webapp', 'css')));
+app.use('/js', express.static(path.join(__dirname, '../webapp', 'js')));
 
 // 404 handler
 app.use((req, res) => {
