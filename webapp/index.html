@@ -490,6 +490,181 @@
       font-size: 10px;
       color: var(--text-muted);
     }
+
+    /* ═══ MODAL STYLES ═══ */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--card);
+      border: 2px solid var(--border-light);
+      border-radius: 20px;
+      padding: 24px;
+      max-width: 320px;
+      width: 90%;
+      animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: linear-gradient(135deg, rgba(255, 165, 0, 0.1), rgba(255, 165, 0, 0.05));
+      border-radius: 8px;
+      color: var(--gold);
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover {
+      background: linear-gradient(135deg, rgba(255, 165, 0, 0.2), rgba(255, 165, 0, 0.1));
+      transform: scale(1.1);
+    }
+
+    .topup-amounts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .amount-btn {
+      padding: 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(255, 165, 0, 0.08), rgba(255, 165, 0, 0.02));
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .amount-btn:hover {
+      border-color: var(--gold);
+      background: linear-gradient(135deg, rgba(255, 165, 0, 0.15), rgba(255, 165, 0, 0.08));
+      transform: translateY(-2px);
+    }
+
+    .amount-btn.selected {
+      background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+      color: #000;
+      border-color: var(--gold);
+      box-shadow: 0 4px 12px rgba(255, 165, 0, 0.3);
+    }
+
+    .custom-amount {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .custom-amount input {
+      flex: 1;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .custom-amount input:focus {
+      outline: none;
+      border-color: var(--gold);
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    .custom-amount input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .topup-submit {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+      color: #000;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 12px rgba(255, 165, 0, 0.3);
+    }
+
+    .topup-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(255, 165, 0, 0.4);
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    }
+
+    .topup-submit:active {
+      transform: scale(0.98);
+    }
+
+    .topup-submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .topup-info {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
   </style>
 </head>
 <body>
@@ -870,12 +1045,126 @@
     </div>
   </div>
   
+  <!-- ═══ TOPUP MODAL ═══ -->
+  <div id="topupModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Pul qo'shish</div>
+        <button class="modal-close" onclick="closeTopupModal()">✕</button>
+      </div>
+
+      <div class="topup-amounts">
+        <button class="amount-btn" onclick="selectAmount(10000)">10,000 so'm</button>
+        <button class="amount-btn" onclick="selectAmount(25000)">25,000 so'm</button>
+        <button class="amount-btn" onclick="selectAmount(50000)">50,000 so'm</button>
+        <button class="amount-btn" onclick="selectAmount(100000)">100,000 so'm</button>
+      </div>
+
+      <div class="custom-amount">
+        <input type="number" id="customAmount" placeholder="Boshqa summa" min="1000" max="10000000">
+      </div>
+
+      <button class="topup-submit" id="topupBtn" onclick="processTopup()">Pul qo'shish</button>
+
+      <div class="topup-info">
+        💳 Humo karta orqali to'lov<br>
+        Xavfsiz va tez
+      </div>
+    </div>
+  </div>
+
   <script>
     const tg = window.Telegram?.WebApp;
     if (tg) {
       tg.ready();
       tg.expand();
     }
+
+    let selectedAmount = 0;
+
+    function openTopupModal() {
+      document.getElementById('topupModal').classList.add('active');
+      selectedAmount = 0;
+      document.querySelectorAll('.amount-btn').forEach(btn => btn.classList.remove('selected'));
+      document.getElementById('customAmount').value = '';
+    }
+
+    function closeTopupModal() {
+      document.getElementById('topupModal').classList.remove('active');
+    }
+
+    function selectAmount(amount) {
+      selectedAmount = amount;
+      document.getElementById('customAmount').value = '';
+      document.querySelectorAll('.amount-btn').forEach(btn => btn.classList.remove('selected'));
+      event.target.classList.add('selected');
+    }
+
+    async function processTopup() {
+      const customAmount = parseInt(document.getElementById('customAmount').value) || 0;
+      const amount = customAmount || selectedAmount;
+
+      if (!amount || amount < 1000) {
+        alert('Iltimos, to\'g\'ri summani tanlang (minimal 1,000 so\'m)');
+        return;
+      }
+
+      if (amount > 10000000) {
+        alert('Maksimal summa 10,000,000 so\'m');
+        return;
+      }
+
+      const btn = document.getElementById('topupBtn');
+      btn.disabled = true;
+      btn.textContent = 'Kutilmoqda...';
+
+      try {
+        // Get init data from Telegram WebApp
+        const initData = tg?.initData || '';
+        
+        if (!initData) {
+          alert('Telegram ma\'lumotlari topilmadi');
+          btn.disabled = false;
+          btn.textContent = 'Pul qo\'shish';
+          return;
+        }
+
+        // Send topup request to API
+        const response = await fetch('/api/topup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            amount,
+            initData
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          alert('✅ To\'lov muvaffaqiyatli amalga oshirildi!');
+          closeTopupModal();
+          updateBalance();
+        } else {
+          alert('❌ Xato: ' + (data.error || 'Noma\'lum xato'));
+        }
+      } catch (error) {
+        console.error('Topup error:', error);
+        alert('❌ Xato: ' + error.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Pul qo\'shish';
+      }
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('topupModal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'topupModal') {
+        closeTopupModal();
+      }
+    });
     
     function navigateTo(page) {
       document.querySelectorAll('.nav-item').forEach(item => {
@@ -894,7 +1183,10 @@
     }
     
     function openTopupModal() {
-      alert('Pul qo\'shish - tez kunda');
+      document.getElementById('topupModal').classList.add('active');
+      selectedAmount = 0;
+      document.querySelectorAll('.amount-btn').forEach(btn => btn.classList.remove('selected'));
+      document.getElementById('customAmount').value = '';
     }
     
     function filterLeaderboard(period) {
