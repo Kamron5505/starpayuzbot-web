@@ -1129,8 +1129,13 @@
           return;
         }
 
+        // Determine API URL based on environment
+        const apiUrl = window.location.hostname === 'localhost' 
+          ? 'http://localhost:3001/api/topup'
+          : '/api/topup';
+
         // Send topup request to API
-        const response = await fetch('/api/topup', {
+        const response = await fetch(apiUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
