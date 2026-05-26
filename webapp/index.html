@@ -47,12 +47,20 @@
       flex: 1;
       display: flex;
       align-items: center;
+      gap: 8px;
     }
     
     .brand-logo {
       height: 40px;
       width: auto;
       max-width: 180px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 8px rgba(255, 165, 0, 0.3));
+    }
+
+    .brand-logo-small {
+      height: 32px;
+      width: 32px;
       object-fit: contain;
       filter: drop-shadow(0 0 8px rgba(255, 165, 0, 0.3));
     }
@@ -149,11 +157,15 @@
       position: relative;
       z-index: 1;
       filter: drop-shadow(0 2px 8px rgba(255, 165, 0, 0.2));
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     .action-icon img {
-      width: 60px;
-      height: 60px;
+      width: 80px;
+      height: 80px;
       object-fit: contain;
     }
     
@@ -678,6 +690,7 @@
     <div id="view-home" class="view active">
       <div class="topbar">
         <div class="brand">
+          <img src="/assets/logo.png" alt="StarPayUz" class="brand-logo-small" onerror="this.style.display='none'">
           <img src="/assets/logo.png" alt="StarPayUz" class="brand-logo" onerror="this.style.display='none'">
         </div>
         <div class="balance-widget">
@@ -689,13 +702,13 @@
       <div class="action-grid">
         <div class="action-card" onclick="navigateTo('stars')">
           <div class="action-icon">
-            <img src="/assets/icon-stars.png" alt="Stars" onerror="this.parentElement.textContent='⭐'">
+            <img src="/assets/icon-stars.png" alt="Stars" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext x=%2250%22 y=%2270%22 font-size=%2260%22 text-anchor=%22middle%22%3E⭐%3C/text%3E%3C/svg%3E'">
           </div>
           <div class="action-label">Stars olish</div>
         </div>
         <div class="action-card" onclick="navigateTo('premium')">
           <div class="action-icon">
-            <img src="/assets/icon-premium.png" alt="Premium" onerror="this.parentElement.textContent='💎'">
+            <img src="/assets/icon-premium.png" alt="Premium" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext x=%2250%22 y=%2270%22 font-size=%2260%22 text-anchor=%22middle%22%3E💎%3C/text%3E%3C/svg%3E'">
           </div>
           <div class="action-label">Premium olish</div>
         </div>
